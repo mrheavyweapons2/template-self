@@ -1,8 +1,9 @@
 /**
- * \file drivetrain.hpp
- * \ingroup cpp-auxilium-template
+ * @file drivetrain.hpp
+ * @author Jeremiah Nairn
+ * @ingroup cpp-auxilium-template
  *
- * Contains headers for a drivetrain class that can be used to simplify
+ * @brief Contains headers for a drivetrain class that can be used to simplify
  * drivetrain control in a robot program. This class is designed to be
  * flexible enough to be used on drivetrains of various sizes, motor counts,
  * and other miscellaneous preferences.

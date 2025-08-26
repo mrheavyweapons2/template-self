@@ -1,11 +1,14 @@
-#include "main.h"
+//includes from pros or other necessary libraries
+#include "pros/misc.h"
 #include "pros/motor_group.hpp"
+#include <cmath>
 
 //header file
 #include "auxilium/drivetrain.hpp"
 
 //implementation of drivetrain methods
 
+//constructor for the class
 drivetrain::drivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //motor groups
 					   double DkP, double DkI, double DkD, //PID values
 					   double driverCurve, double driverOffset) //driver exponential curve values
@@ -64,10 +67,10 @@ void drivetrain::setVelocity(int forward, int turn) {
 // Driver control function that runs a tank drive scheme
 void drivetrain::driverControl(pros::Controller controller) {
 	// dih drive
-	leftStick = pow((controller.get_analog(ANALOG_LEFT_Y)), driveCurve) / driveOffset;
-	if ((controller.get_analog(ANALOG_LEFT_Y) < 0) && (leftStick > 0)) leftStick = -leftStick;
-	rightStick = pow((controller.get_analog(ANALOG_RIGHT_Y)), driveCurve) / driveOffset;
-	if ((controller.get_analog(ANALOG_RIGHT_Y) < 0) && (rightStick > 0)) rightStick = -rightStick;
+	leftStick = pow((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), driveCurve) / driveOffset;
+	if ((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0) && (leftStick > 0)) leftStick = -leftStick;
+	rightStick = pow((controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y)), driveCurve) / driveOffset;
+	if ((controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_Y) < 0) && (rightStick > 0)) rightStick = -rightStick;
 	leftMG.move(leftStick);
 	rightMG.move(rightStick);
 }
