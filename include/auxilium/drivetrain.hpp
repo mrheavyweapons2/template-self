@@ -12,7 +12,6 @@
 #ifndef DRIVETRAIN_HPP
 #define DRIVETRAIN_HPP
 
-#include "main.h"
 #include "pros/motor_group.hpp"
 
 
