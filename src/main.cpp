@@ -1,12 +1,14 @@
 //main file for the robot program
 
+//include PROS and other necessary libraries
 #include "main.h"
 #include "pros/motor_group.hpp"
 #include <fstream>
 #include <string>
 
 //include the drivetrain implementation
-#include "custom/drivetrain.hpp"
+#include "auxilium/drivetrain.hpp"
+
 
 //simple settings that can be changed up here instead of looking for it in the program
 
@@ -18,6 +20,7 @@
 
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
+
 
 //class that handles logging data into a CSV file
 class fileLogger {
@@ -48,7 +51,7 @@ class fileLogger {
 //declare the motor groups
 pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
 pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
-//declare the drivetrain
+//declare the drivetrain from drivetrain.hpp
 drivetrain dt(leftMG, rightMG,		    //declaring the motor groups
 				drivetrainKP, drivetrainKI, drivetrainKD, //declaring PID values
 				DRIVECURVE, CURVEOFFSET); //declaring drive curve values	

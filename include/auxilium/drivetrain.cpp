@@ -2,7 +2,7 @@
 #include "pros/motor_group.hpp"
 
 //header file
-#include "custom/drivetrain.hpp"
+#include "auxilium/drivetrain.hpp"
 
 //implementation of drivetrain methods
 
