@@ -7,23 +7,43 @@
  * drivetrain control in a robot program. This class is designed to be
  * flexible enough to be used on drivetrains of various sizes, motor counts,
  * and other miscellaneous preferences.
+ * (before you fucking ask, yes i did copy and paste this below)
  * 
  */
 
 #ifndef DRIVETRAIN_HPP
 #define DRIVETRAIN_HPP
 
+//required include for the PROS system
 #include "pros/motor_group.hpp"
 
-
+/**
+ * @class drivetrain
+ * @brief A class designed to simplify drivetrain control in a robot program.
+ * This class is designed to be flexible enough to be used on drivetrains of
+ * various sizes, motor counts, and other miscellaneous preferences. 
+ */
 class drivetrain {
     
     private:
-        //declare the motor groups
+        /**
+		 * Motor groups for the left and right sides of the drivetrain
+		 * These should be initialized in main.cpp and passed to the drivetrain
+		 * constructor when creating a drivetrain object.
+		 * @code
+		 * pros::MotorGroup leftMG({1, -2, 3});
+		 * pros::MotorGroup rightMG({-4, 5, -6});
+		 * //place the constructor after this
+		 * @endcode
+		 * This allows for flexibility in motor configuration and count, as well as
+		 * makes it very easy to change motor locations and types.
+		 * 
+		 */
 		pros::MotorGroup& leftMG;
 		pros::MotorGroup& rightMG;
 
-		//values for the driver control scheme
+		//stick values for driver control (notice the drop in quality with the text? 
+		// i just realized i dont need to to make long ass comments for private variables)
 		double leftStick;
 		double rightStick;
 

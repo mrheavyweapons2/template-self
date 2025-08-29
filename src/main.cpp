@@ -7,7 +7,7 @@
 #include <string>
 
 //include the drivetrain implementation
-#include "auxilium/drivetrain.hpp"
+#include "auxilium/drivetrainService.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
