@@ -8,22 +8,10 @@
 
 //implementation of drivetrain methods
 
-//constructor for the class
-tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //motor groups
-					   double DkP, double DkI, double DkD, //PID values
-					   double driverCurve, double driverOffset) //driver exponential curve values
-	//matching the constructor values to the private variables
-	: leftMG(leftMotorgroup), rightMG(rightMotorgroup),
-	kP(DkP), kI(DkI), kD(DkD),
-	driveCurve(driverCurve), driveOffset(driverOffset),
 
-	//initializing the rest of the variables
-	leftStick(0), rightStick(0),
-	previousError(0), integralSec(0), integralLimit(50)
-{}
 
 // PID function that takes the setpoint and returns a desired value to set the motors to
-double tankDrivetrain::PID(double target, double current) {	
+double driveFrame::PID(double kP, double kI, double kD, double target, double current) {	
 	double error = target - current;
 
 	// proportional equation
@@ -47,10 +35,18 @@ double tankDrivetrain::PID(double target, double current) {
 }
 
 // Small function for resetting the loop for reusability
-void tankDrivetrain::resetvariables() {
+void driveFrame::resetvariables() {
 	previousError = 0;
 	integralSec = 0;
 }
+
+//constructor for tankDrivetrain
+tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declaring the motorgroups
+                               double MkP, double MkI, double MkD, //declare the pid values for movement
+                               double TkP, double TkI, double TkD, //delcare the pid values for turning
+                               int driverCurve, int driverOffset) //declare driver curve values
+    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset), //superclass constructor
+      leftMG(leftMotorgroup), rightMG(rightMotorgroup) {} //initialize the motor groups
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
 void tankDrivetrain::setVelocity(int forward, int turn) {

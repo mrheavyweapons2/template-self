@@ -17,13 +17,57 @@
 //required include for the PROS system
 #include "pros/motor_group.hpp"
 
+
 /**
- * @class drivetrain
- * @brief A class designed to simplify drivetrain control in a robot program.
- * This class is designed to be flexible enough to be used on drivetrains of
- * various sizes, motor counts, and other miscellaneous preferences. 
+ * @class driveFrame
+ * @brief Superclass that handles function declarations, as well as
+ * private variables that are shared between the different drivetrain
+ * subclasses. This class should not be used directly, as it does not hold
+ * any implementation of drivetrain control.
  */
-class tankDrivetrain {
+ class driveFrame {
+	public:
+		//drive curve values
+		int driveCurve;
+		int driveOffset;
+
+		//declare PID values
+		double previousError;
+		double integralSec;
+		double integralLimit;
+
+		//complementary pid function from my code in 2024
+		//PID values for distance (modified to be constructor based)
+		//movement
+		double MkP;
+		double MkI;
+		double MkD;
+		//turning
+		double TkP;
+		double TkI;
+		double TkD;
+
+        //pid function that takes the setpoint and returns a desired value to set the motors to
+        double PID(double kP, double kI, double kD, double target, double current);
+
+        //small function for reseting the loop for reusability
+		void resetvariables();
+
+		//constructor that takes the PID values and drive curve values
+		driveFrame(double MkP, double MkI, double MkD, //movement PID values
+				   double TkP, double TkI, double TkD, //turning PID values
+				   double driverCurve, double driverOffset); //driver exponential curve values
+ };
+
+
+/**
+ * @class tank drivetrain
+ * @brief Subclass that handles tank drive control schemes,
+ * tank drive is the most common form of drivetrain, as well as
+ * the simplest to implement. This class is designed to be
+ * flexible enough to be used on drivetrains of various sizes.
+ */
+class tankDrivetrain : public driveFrame {
     
     private:
         /**
@@ -47,36 +91,15 @@ class tankDrivetrain {
 		double leftStick;
 		double rightStick;
 
-		//drive curve values
-		int driveCurve;
-		int driveOffset;
-
-		//declare PID values
-		double previousError;
-		double integralSec;
-		double integralLimit;
-
-		//complementary pid function from my code in 2024
-		//PID values for distance (modified to be constructor based)
-		double kP;
-		double kI;
-		double kD;
-
-        //pid function that takes the setpoint and returns a desired value to set the motors to
-        double PID(double target, double current);
-
-        //small function for reseting the loop for reusability
-		void resetvariables();
-
         //function that takes the turn and forward values and sets the motor speeds accordingly
 		void setVelocity(int forward, int turn);
 
 	public:
 		//constructor that takes the motor groups and the PID values
 		tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
-               double DkP, double DkI, double DkD,
-               double driverCurve, double driverOffset);
-
+                       double MkP, double MkI, double MkD,
+                       double TkP, double TkI, double TkD,
+                       int driverCurve, int driverOffset); //just the motorgroups here
 
 		//driver control function that runs a tank drive scheme
 		void driverControl(pros::Controller controller);

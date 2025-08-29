@@ -14,9 +14,14 @@
 
 #define GEARSET pros::v5::MotorGears::blue //motor gearset
 
-#define drivetrainKP 0.5 //drivetrain proportional value
-#define drivetrainKI 0.01 //drivetrain integral value
-#define drivetrainKD 0.1 //drivetrain derivative value
+//defining PID values for movement, as well as turning
+#define drivetrainMKP 1 //proportional for movement
+#define drivetrainMKI 0.001 //integral for movement
+#define drivetrainMKD 0.1 //derivative for movement
+
+#define drivetrainTKP 1 //proportional for turning
+#define drivetrainTKI 0.001 //integral for turning
+#define drivetrainTKD 0.1 //derivative for turning
 
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
@@ -52,9 +57,10 @@ class fileLogger {
 pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
 pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
 //declare the drivetrain from drivetrain.hpp
-tankDrivetrain dt(leftMG, rightMG,		    //declaring the motor groups
-				drivetrainKP, drivetrainKI, drivetrainKD, //declaring PID values
-				DRIVECURVE, CURVEOFFSET); //declaring drive curve values	
+tankDrivetrain dt(leftMG, rightMG,
+                  drivetrainMKP, drivetrainMKI, drivetrainMKD,
+                  drivetrainTKP, drivetrainTKI, drivetrainTKD,
+                  DRIVECURVE, CURVEOFFSET);
 
 
 //prebuilt function that runs as soon as the program starts
