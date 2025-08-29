@@ -85,6 +85,17 @@ xDrivetrain xDrive(frontLeftMG, backLeftMG, frontRightMG, backRightMG, //pass th
 				  DRIVECURVE, CURVEOFFSET, //curve values
 				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
 
+//SAMPLE MECHANUM DRIVE
+
+//(uses same motor groups as x drive)
+
+//declare the drivetrain from drivetrainService.hpp
+mechanumDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //pass the motor groups
+				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
+				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
+				  DRIVECURVE, CURVEOFFSET, //curve values
+				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
+
 //prebuilt function that runs as soon as the program starts
 void initialize() {
 	pros::lcd::initialize();

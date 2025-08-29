@@ -1,4 +1,5 @@
 //includes from pros or other necessary libraries
+#include "drivetrainService.hpp"
 #include "pros/misc.h"
 #include "pros/motor_group.hpp"
 #include <cmath>
@@ -104,6 +105,49 @@ void xDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVe
 
 //driver control function
 void xDrivetrain::driverControl(pros::Controller controller) {
+	//take the drive code and the driveCurve and driveDivider into account
+	//invert the value if the joystick reads negative
+	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
+	double strafe = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X), driveCurve)/driveOffset;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) < 0 && (strafe > 0)) strafe = -strafe;
+	double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X), driveCurve)/driveOffset;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) < 0 && (turn > 0)) turn = -turn;
+	//set the drive velocity
+	setVelocity(forward, strafe, turn);
+}
+
+//constructor for xDrivetrain here
+mechanumDrivetrain::mechanumDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup, //front motor groups
+                         pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup, //rear motor groups
+                         double MkP, double MkI, double MkD, //movement PID values
+                         double TkP, double TkI, double TkD, //turning PID values
+                         int driverCurve, int driverOffset, //driver exponential curve values
+                         double* x, double* y, double* theta) //pointers that relay the robots position
+    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta),
+      frontLeftMG(frontLeftMotorgroup), //initialize the motor groups
+      frontRightMG(frontRightMotorgroup),
+      backLeftMG(backLeftMotorgroup),
+      backRightMG(backRightMotorgroup) {}
+
+//function to control the motor velocities
+void mechanumDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVel) {
+	//calculate the motor speeds based on how an mechanum drive should properly work
+	double frontLeftSpeed = forwardVel + strafeVel + turnVel;
+	double frontRightSpeed = forwardVel - strafeVel - turnVel;
+	double backLeftSpeed = forwardVel - strafeVel + turnVel;
+	double backRightSpeed = forwardVel + strafeVel - turnVel;
+
+	//set the motor speeds
+	frontLeftMG.move(frontLeftSpeed);
+	frontRightMG.move(frontRightSpeed);
+	backLeftMG.move(backLeftSpeed);
+	backRightMG.move(backRightSpeed);
+}
+
+
+//driver control function
+void mechanumDrivetrain::driverControl(pros::Controller controller) {
 	//take the drive code and the driveCurve and driveDivider into account
 	//invert the value if the joystick reads negative
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
