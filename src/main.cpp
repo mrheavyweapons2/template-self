@@ -57,17 +57,33 @@ class fileLogger {
 
 };
 
+//SAMPLE TANK DECLARATION
 
 //declare the motor groups
 pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
 pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
-//declare the drivetrain from drivetrain.hpp
-tankDrivetrain dt(leftMG, rightMG, //pass the motor groups
+//declare the drivetrain from drivetrainService.hpp
+tankDrivetrain tank(leftMG, rightMG, //pass the motor groups
                   drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
                   drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
                   DRIVECURVE, CURVEOFFSET, //curve values
                   &robotX, &robotY, &robotTheta); //pointers to the robots position variables
 
+
+				  
+//SAMPLE X DRIVE DECLARATION
+
+//declare the motor groups
+pros::MotorGroup frontLeftMG({1, -2},GEARSET);
+pros::MotorGroup backLeftMG({3, -4},GEARSET);
+pros::MotorGroup frontRightMG({-5, 6},GEARSET);
+pros::MotorGroup backRightMG({-7, 8},GEARSET);
+//declare the drivetrain from drivetrainService.hpp
+xDrivetrain xDrive(frontLeftMG, backLeftMG, frontRightMG, backRightMG, //pass the motor groups
+				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
+				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
+				  DRIVECURVE, CURVEOFFSET, //curve values
+				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
 
 //prebuilt function that runs as soon as the program starts
 void initialize() {
@@ -89,7 +105,8 @@ void opcontrol() {
 	pros::Controller master(pros::E_CONTROLLER_MASTER);
 
 	while (true) {
-        dt.driverControl(master);
+		//driver control
+        tank.driverControl(master);
 		pros::delay(20);
 	}
 }
