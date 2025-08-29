@@ -26,6 +26,11 @@
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
 
+//defining position values the robots position (in X, Y, and heading)
+double robotX = 0;
+double robotY = 0;
+double robotTheta = 0;
+
 
 //class that handles logging data into a CSV file
 class fileLogger {
@@ -57,10 +62,11 @@ class fileLogger {
 pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
 pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
 //declare the drivetrain from drivetrain.hpp
-tankDrivetrain dt(leftMG, rightMG,
-                  drivetrainMKP, drivetrainMKI, drivetrainMKD,
-                  drivetrainTKP, drivetrainTKI, drivetrainTKD,
-                  DRIVECURVE, CURVEOFFSET);
+tankDrivetrain dt(leftMG, rightMG, //pass the motor groups
+                  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
+                  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
+                  DRIVECURVE, CURVEOFFSET, //curve values
+                  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
 
 
 //prebuilt function that runs as soon as the program starts

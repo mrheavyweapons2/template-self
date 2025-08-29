@@ -56,16 +56,23 @@
 		//constructor that takes the PID values and drive curve values
 		driveFrame(double MkP, double MkI, double MkD, //movement PID values
 				   double TkP, double TkI, double TkD, //turning PID values
-				   double driverCurve, double driverOffset); //driver exponential curve values
+				   int driverCurve, int driverOffset, //driver exponential curve values
+				   double* x, double* y, double* theta); // robot pose variables
  };
 
 
 /**
  * @class tank drivetrain
- * @brief Subclass that handles tank drive control schemes,
+ * @brief Class that handles tank drive control schemes,
  * tank drive is the most common form of drivetrain, as well as
  * the simplest to implement. This class is designed to be
  * flexible enough to be used on drivetrains of various sizes.
+ * @code This is how you implement it:
+ * tankDrivetrain yourDrivetrain(leftMotorGroup, rightMotorGroup, 
+ *                pidMovementKP, pidMovementKI, pidMovementKD,
+ *                pidTurnKP, pidTurnKI, pidTurnKD,
+ *                driveCurve, curveOffset,
+ *                &robotX, &robotY, &robotTheta); 
  */
 class tankDrivetrain : public driveFrame {
     
@@ -99,7 +106,8 @@ class tankDrivetrain : public driveFrame {
 		tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
                        double MkP, double MkI, double MkD,
                        double TkP, double TkI, double TkD,
-                       int driverCurve, int driverOffset); //just the motorgroups here
+                       int driverCurve, int driverOffset,
+                       double* x, double* y, double* theta); 
 
 		//driver control function that runs a tank drive scheme
 		void driverControl(pros::Controller controller);

@@ -41,11 +41,12 @@ void driveFrame::resetvariables() {
 }
 
 //constructor for tankDrivetrain
-tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declaring the motorgroups
-                               double MkP, double MkI, double MkD, //declare the pid values for movement
-                               double TkP, double TkI, double TkD, //delcare the pid values for turning
-                               int driverCurve, int driverOffset) //declare driver curve values
-    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset), //superclass constructor
+tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declare the motorgroups
+                               double MkP, double MkI, double MkD, //movement PID values
+                               double TkP, double TkI, double TkD, //turning PID values
+                               int driverCurve, int driverOffset, //driver exponential curve values
+                               double* x, double* y, double* theta) //pointers that relay the robots position
+    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta),
       leftMG(leftMotorgroup), rightMG(rightMotorgroup) {} //initialize the motor groups
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
