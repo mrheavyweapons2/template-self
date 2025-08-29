@@ -140,7 +140,7 @@ class xDrivetrain : public driveFrame {
     	double rightStick;
     	double strafeStick;
 
-    	void setVelocity(int forward, int strafe, int turn);
+    	void setVelocity(double forward, double strafe, double turn);
 
 	public:
     	xDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,

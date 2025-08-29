@@ -103,7 +103,7 @@ void xDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVe
 
 
 //driver control function
-void xDrivetrain::driverControl(pros::Controller& controller) {
+void xDrivetrain::driverControl(pros::Controller controller) {
 	//take the drive code and the driveCurve and driveDivider into account
 	//invert the value if the joystick reads negative
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
