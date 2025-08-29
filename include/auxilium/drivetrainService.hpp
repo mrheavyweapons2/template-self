@@ -73,6 +73,7 @@
  *                pidTurnKP, pidTurnKI, pidTurnKD,
  *                driveCurve, curveOffset,
  *                &robotX, &robotY, &robotTheta); 
+ * @endcode
  */
 class tankDrivetrain : public driveFrame {
     
@@ -109,7 +110,14 @@ class tankDrivetrain : public driveFrame {
                        int driverCurve, int driverOffset,
                        double* x, double* y, double* theta); 
 
-		//driver control function that runs a tank drive scheme
+		/**
+		 * Driver control function that takes a controller input and
+		 * sets the motor speeds accordingly.
+		 * @code
+		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
+		 * myDrivetrain.driverControl(master);
+		 * @endcode
+		 */
 		void driverControl(pros::Controller controller);
 
 };
@@ -130,16 +138,18 @@ class tankDrivetrain : public driveFrame {
  */
 class xDrivetrain : public driveFrame {
 	private:
-		//delcare the motor groups
+		//declare the motor groups
     	pros::MotorGroup& frontLeftMG;
     	pros::MotorGroup& frontRightMG;
     	pros::MotorGroup& backLeftMG;
     	pros::MotorGroup& backRightMG;
 
+		//declare the values for the sticks
     	double leftStick;
     	double rightStick;
     	double strafeStick;
 
+		//function that sets the velocity
     	void setVelocity(double forward, double strafe, double turn);
 
 	public:
@@ -150,6 +160,14 @@ class xDrivetrain : public driveFrame {
                 	int driverCurve, int driverOffset,
                 	double* x, double* y, double* theta);
 
+		/**
+		 * Driver control function that takes a controller input and
+		 * sets the motor speeds accordingly.
+		 * @code
+		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
+		 * myDrivetrain.driverControl(master);
+		 * @endcode
+		 */
     	void driverControl(pros::Controller controller);
 };
 
