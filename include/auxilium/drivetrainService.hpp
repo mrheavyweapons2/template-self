@@ -67,7 +67,7 @@
  * tank drive is the most common form of drivetrain, as well as
  * the simplest to implement. This class is designed to be
  * flexible enough to be used on drivetrains of various sizes.
- * @code This is how you implement it:
+ * @code
  * tankDrivetrain yourDrivetrain(leftMotorGroup, rightMotorGroup, 
  *                pidMovementKP, pidMovementKI, pidMovementKD,
  *                pidTurnKP, pidTurnKI, pidTurnKD,
@@ -113,5 +113,45 @@ class tankDrivetrain : public driveFrame {
 		void driverControl(pros::Controller controller);
 
 };
+
+/**
+ * @class xDrivetrain
+ * @brief Class that handles X drive control schemes, which use four motors (or motor groups) 
+ * mounted at 45-degree angles to allow for omnidirectional movement. This class 
+ * provides flexible control for X drive robots, supporting various motor configurations
+ * and PID tuning for precise movement and turning.
+ * @code
+ * xDrivetrain yourDrivetrain(frontLeftMG, frontRightMG, backLeftMG, backRightMG,
+ *                pidMovementKP, pidMovementKI, pidMovementKD,
+ *                pidTurnKP, pidTurnKI, pidTurnKD,
+ *                driveCurve, curveOffset,
+ *                &robotX, &robotY, &robotTheta);
+ * @endcode
+ */
+class xDrivetrain : public driveFrame {
+	private:
+		//delcare the motor groups
+    	pros::MotorGroup& frontLeftMG;
+    	pros::MotorGroup& frontRightMG;
+    	pros::MotorGroup& backLeftMG;
+    	pros::MotorGroup& backRightMG;
+
+    	double leftStick;
+    	double rightStick;
+    	double strafeStick;
+
+    	void setVelocity(int forward, int strafe, int turn);
+
+	public:
+    	xDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,
+                	pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup,
+                	double MkP, double MkI, double MkD,
+                	double TkP, double TkI, double TkD,
+                	int driverCurve, int driverOffset,
+                	double* x, double* y, double* theta);
+
+    	void driverControl(pros::Controller controller);
+};
+
 
 #endif //DRIVETRAIN_HPP
