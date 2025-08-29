@@ -52,7 +52,7 @@ class fileLogger {
 pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
 pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
 //declare the drivetrain from drivetrain.hpp
-drivetrain dt(leftMG, rightMG,		    //declaring the motor groups
+tankDrivetrain dt(leftMG, rightMG,		    //declaring the motor groups
 				drivetrainKP, drivetrainKI, drivetrainKD, //declaring PID values
 				DRIVECURVE, CURVEOFFSET); //declaring drive curve values	
 

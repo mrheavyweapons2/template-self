@@ -9,7 +9,7 @@
 //implementation of drivetrain methods
 
 //constructor for the class
-drivetrain::drivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //motor groups
+tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //motor groups
 					   double DkP, double DkI, double DkD, //PID values
 					   double driverCurve, double driverOffset) //driver exponential curve values
 	//matching the constructor values to the private variables
@@ -23,7 +23,7 @@ drivetrain::drivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& right
 {}
 
 // PID function that takes the setpoint and returns a desired value to set the motors to
-double drivetrain::PID(double target, double current) {	
+double tankDrivetrain::PID(double target, double current) {	
 	double error = target - current;
 
 	// proportional equation
@@ -47,13 +47,13 @@ double drivetrain::PID(double target, double current) {
 }
 
 // Small function for resetting the loop for reusability
-void drivetrain::resetvariables() {
+void tankDrivetrain::resetvariables() {
 	previousError = 0;
 	integralSec = 0;
 }
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
-void drivetrain::setVelocity(int forward, int turn) {
+void tankDrivetrain::setVelocity(int forward, int turn) {
 	// couple of if statements to hold each of the values within the -127 to 127 range
 	if (forward > 127) forward = 127;
 	if (forward < -127) forward = -127;
@@ -65,7 +65,7 @@ void drivetrain::setVelocity(int forward, int turn) {
 }
 
 // Driver control function that runs a tank drive scheme
-void drivetrain::driverControl(pros::Controller controller) {
+void tankDrivetrain::driverControl(pros::Controller controller) {
 	// dih drive
 	leftStick = pow((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), driveCurve) / driveOffset;
 	if ((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0) && (leftStick > 0)) leftStick = -leftStick;

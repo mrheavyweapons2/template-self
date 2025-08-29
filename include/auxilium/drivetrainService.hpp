@@ -23,7 +23,7 @@
  * This class is designed to be flexible enough to be used on drivetrains of
  * various sizes, motor counts, and other miscellaneous preferences. 
  */
-class drivetrain {
+class tankDrivetrain {
     
     private:
         /**
@@ -73,7 +73,7 @@ class drivetrain {
 
 	public:
 		//constructor that takes the motor groups and the PID values
-		drivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
+		tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
                double DkP, double DkI, double DkD,
                double driverCurve, double driverOffset);
 
