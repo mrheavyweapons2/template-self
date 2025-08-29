@@ -71,3 +71,62 @@ void tankDrivetrain::driverControl(pros::Controller controller) {
 	leftMG.move(leftStick);
 	rightMG.move(rightStick);
 }
+
+//class that holds x drive code
+class xDrivetrain {
+
+	private:
+		//declare the motorgroups for the initialization
+		pros::MotorGroup& frontLeft;
+		pros::MotorGroup& frontRight;
+		pros::MotorGroup& backLeft;
+		pros::MotorGroup& backRight;
+
+		//declare pid values for both driving in a direciton and turning
+		double driveKp, driveKi, driveKd; //moving around
+		double turnKp, turnKi, turnKd; //turning
+
+		//declare drivecurve values
+		double driveCurve, driveDivider;
+
+		//function to control the motor velocities
+		void setDrivetrainVelocity(double forwardVel, double strafeVel, double turnVel) {
+			//calculate the motor speeds based on how an x drive should properly work
+			double frontLeftSpeed = forwardVel + strafeVel + turnVel;
+			double frontRightSpeed = forwardVel - strafeVel - turnVel;
+			double backLeftSpeed = forwardVel - strafeVel + turnVel;
+			double backRightSpeed = forwardVel + strafeVel - turnVel;
+
+			//set the motor speeds
+			frontLeft.move(frontLeftSpeed);
+			frontRight.move(frontRightSpeed);
+			backLeft.move(backLeftSpeed);
+			backRight.move(backRightSpeed);
+		}
+
+	public:
+		//constructor
+		drivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,
+				  pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup,
+				  double DkP, double DkI, double DkD,
+				  double TkP, double TkI, double TkD,
+				  double driveCurve = 2, double driveOffset = 127)
+			: frontLeft(frontLeftMotorgroup), frontRight(frontRightMotorgroup),
+			  backLeft(backLeftMotorgroup), backRight(backRightMotorgroup),
+			  driveKp(DkP), driveKi(DkI), driveKd(DkD),
+			  turnKp(TkP), turnKi(TkI), turnKd(TkD),
+			  driveCurve(driveCurve), driveDivider(driveOffset) {}
+
+		//driver control function
+		void driveControl(pros::Controller& controller) {
+			//take the drive code and the driveCurve and driveDivider into account
+			//invert the value if the joystick reads negative
+			double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveDivider;
+			if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
+			double strafe = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X), driveCurve)/driveDivider;
+			if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) < 0 && (strafe > 0)) strafe = -strafe;
+			double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X), driveCurve)/driveDivider;
+			if (controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) < 0 && (turn > 0)) turn = -turn;
+			//set the drive velocity
+			setDrivetrainVelocity(forward, strafe, turn);
+		}
