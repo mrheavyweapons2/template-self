@@ -26,7 +26,7 @@
  * any implementation of drivetrain control.
  */
  class driveFrame {
-	public:
+	protected:
 		//drive curve values
 		int driveCurve;
 		int driveOffset;
