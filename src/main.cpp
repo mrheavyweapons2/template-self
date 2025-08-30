@@ -5,8 +5,9 @@
 #include "pros/motor_group.hpp"
 #include <string>
 
-//include the drivetrain implementation
+//include auxilium implementation
 #include "auxilium/drivetrainService.hpp"
+#include "auxilium/liasonService.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
@@ -68,6 +69,10 @@ mechanumDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG,
 				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
 				  DRIVECURVE, CURVEOFFSET, //curve values
 				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
+
+//SAMPLE FILE LOGGER DECLARATION
+fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
+
 
 //prebuilt function that runs as soon as the program starts
 void initialize() {

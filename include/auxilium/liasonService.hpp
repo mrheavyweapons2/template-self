@@ -15,11 +15,14 @@
 #include <string>
 #include <fstream>
 
+//class for logging data to a file (add more later)
 class fileLogger {
 	private:
+        //file stream for logging
 		std::ofstream logFile;
 
 	public:
+        //constructor that takes the filename and header (first line of the file)
 		fileLogger(std::string filename, std::string header);
 		void logData(std::string data);
 };
