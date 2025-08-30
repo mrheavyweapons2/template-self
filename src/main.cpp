@@ -3,7 +3,6 @@
 //include PROS and other necessary libraries
 #include "main.h"
 #include "pros/motor_group.hpp"
-#include <fstream>
 #include <string>
 
 //include the drivetrain implementation
@@ -30,32 +29,6 @@
 double robotX = 0;
 double robotY = 0;
 double robotTheta = 0;
-
-
-//class that handles logging data into a CSV file
-class fileLogger {
-	private:
-		//holder for the file
-		std::ofstream logFile;
-
-	public:
-		//constructor that opens the log file and adds the header,
-		//filename example would be "/usd/logfile.csv" (you could literally copy and paste this in and it would work)
-		fileLogger(std::string filename, std::string header) {
-			logFile.open(filename);
-			if (logFile.is_open()) {
-				logFile << header << "\n"; //header
-			}
-		}
-		//simple function that logs data to the file
-		void logData(std::string data) {
-			if (logFile.is_open()) {
-				logFile << data << "\n"; //logged data
-			}
-		}
-
-
-};
 
 //SAMPLE TANK DECLARATION
 
