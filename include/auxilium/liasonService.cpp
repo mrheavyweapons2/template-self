@@ -15,7 +15,7 @@ fileLogger::fileLogger(std::string filename, std::string header) {
 }
 		
 //simple function that logs data to the file
-void fileLogger::logData(std::string data) {
+void fileLogger::logCSVData(std::string data) {
 	if (logFile.is_open()) {
 		logFile << data << "\n"; //logged data
 	}

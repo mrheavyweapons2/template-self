@@ -15,16 +15,32 @@
 #include <string>
 #include <fstream>
 
-//class for logging data to a file (add more later)
+/**
+ * @class fileLogger
+ * @brief Class that handles logging data into a a file,
+ * allowing for easy tracking of robot performance and behavior.
+ * The intended use case is to use a CSV file format for the logs,
+ * making it easy to analyze the data with spreadsheet software, and/or
+ * placing the data into desmos or any other graph sheet.
+ */
 class fileLogger {
 	private:
         //file stream for logging
 		std::ofstream logFile;
 
 	public:
-        //constructor that takes the filename and header (first line of the file)
+        /**
+         * @brief Constructor that initializes the log file and writes the header.
+         * @param filename The name of the file to log data to.
+         * @param header The header line to write to the file.
+         */
 		fileLogger(std::string filename, std::string header);
-		void logData(std::string data);
+
+        /**
+         * @brief Logs data to the CSV file.
+         * @param data The data to log (if using a CSV, commas separate values)
+         */
+		void logCSVData(std::string data);
 };
 
 #endif // LIASONSERVICE_HPP
