@@ -111,6 +111,7 @@ class tankDrivetrain : public driveFrame {
 		/**
 		 * Driver control function that takes a controller input and
 		 * sets the motor speeds accordingly.
+		 * @param controller The controller object to read driver input from.
 		 * @code
 		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
 		 * myDrivetrain.driverControl(master);
