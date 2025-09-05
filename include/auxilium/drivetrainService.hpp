@@ -122,13 +122,13 @@ class tankDrivetrain : public driveFrame {
 };
 
 /**
- * @class xDrivetrain
- * @brief Class that handles X drive control schemes, which use four motors (or motor groups) 
- * mounted at 45-degree angles to allow for omnidirectional movement. This class 
- * provides flexible control for X drive robots, supporting various motor configurations
+ * @class odomDrivetrain
+ * @brief Class that handles omni directional control schemes, which use four motors (or motor groups)
+ * mounted on each corner of the robot to control movement. This class
+ * provides flexible control for omni directional drive robots, supporting various motor configurations
  * and PID tuning for precise movement and turning.
  * @code
- * xDrivetrain yourDrivetrain(frontLeftMG, frontRightMG, backLeftMG, backRightMG,
+ * odomDrivetrain yourDrivetrain(frontLeftMG, frontRightMG, backLeftMG, backRightMG,
  *                pidMovementKP, pidMovementKI, pidMovementKD,
  *                pidTurnKP, pidTurnKI, pidTurnKD,
  *                driveCurve, curveOffset,
