@@ -8,6 +8,7 @@
 //include auxilium implementation
 #include "auxilium/drivetrainService.hpp"
 #include "auxilium/liasonService.hpp"
+#include "auxilium/odomService.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
@@ -26,6 +27,9 @@
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
 
+#define WHEELDIAMETER 2.75 //wheel diameter for odometry (in inches)
+#define GEARRATIO 36.0/36.0 //gear ratio for odometry (output speed / input speed)
+
 //defining position values the robots position (in X, Y, and heading)
 double robotX = 0;
 double robotY = 0;
@@ -42,6 +46,32 @@ omniDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //p
 				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
 				  DRIVECURVE, CURVEOFFSET, //curve values
 				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
+
+//declare 1 motor from each motorgroup to function as motor encoders
+pros::Motor leftFrontEncoder(1, GEARSET);
+pros::Motor rightFrontEncoder(-4, GEARSET);
+pros::Motor backLeftEncoder(11, GEARSET);
+pros::Motor backRightEncoder(-17, GEARSET);
+
+
+//declare the mechanum odometry function as a task
+struct odomSetup {
+	pros::Motor& leftFrontEncoder;
+	pros::Motor& rightFrontEncoder;
+	pros::Motor& backLeftEncoder;
+	pros::Motor& backRightEncoder;
+	double& robotX;
+	double& robotY;
+	double& robotTheta;
+	double wheelDiameter;
+	double gearRatio;
+};
+
+odomSetup odomStruct = {leftFrontEncoder, rightFrontEncoder, backLeftEncoder, backRightEncoder,
+						robotX, robotY, robotTheta,
+						WHEELDIAMETER, GEARRATIO};
+
+pros::Task odomTask(mechBasicOdom, (void*)&odomStruct, "Odom Task");
 
 //declare other motors
 pros::Motor intakeMotorFront(-7, GEARSET);
