@@ -8,7 +8,18 @@
 
 //implementation of drivetrain methods
 
-
+driveFrame::driveFrame(double MkP, double MkI, double MkD,
+                       double TkP, double TkI, double TkD,
+                       int driverCurve, int driverOffset,
+                       double* x, double* y, double* theta)
+    : MkP(MkP), MkI(MkI), MkD(MkD),
+      TkP(TkP), TkI(TkI), TkD(TkD),
+      driveCurve(driverCurve), driveOffset(driverOffset),
+      previousError(0), integralSec(0), integralLimit(0)
+{
+    // Optionally store x, y, theta pointers if you need them as members
+    // Otherwise, remove them from the parameter list if not used
+}
 
 // PID function that takes the setpoint and returns a desired value to set the motors to
 double driveFrame::PID(double kP, double kI, double kD, double target, double current) {	
@@ -40,6 +51,8 @@ void driveFrame::resetvariables() {
 	integralSec = 0;
 }
 
+
+
 //constructor for tankDrivetrain
 tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declare the motorgroups
                                double MkP, double MkI, double MkD, //movement PID values
@@ -62,7 +75,7 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 }
 
 // Driver control function that runs a tank drive scheme
-void tankDrivetrain::driverControl(pros::Controller controller) {
+void tankDrivetrain::driverControl(pros::v5::Controller& controller) {
 	// dih drive
 	leftStick = pow((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), driveCurve) / driveOffset;
 	if ((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0) && (leftStick > 0)) leftStick = -leftStick;
@@ -88,6 +101,14 @@ xDrivetrain::xDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup
 
 //function to control the motor velocities
 void xDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVel) {
+	//if statements to keep the values within the -127 to 127 range
+	if (forwardVel > 127) forwardVel = 127;
+	if (forwardVel < -127) forwardVel = -127;
+	if (strafeVel > 127) strafeVel = 127;
+	if (strafeVel < -127) strafeVel = -127;
+	if (turnVel > 127) turnVel = 127;
+	if (turnVel < -127) turnVel = -127;
+
 	//calculate the motor speeds based on how an x drive should properly work
 	double frontLeftSpeed = forwardVel + strafeVel + turnVel;
 	double frontRightSpeed = forwardVel - strafeVel - turnVel;
@@ -103,7 +124,7 @@ void xDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVe
 
 
 //driver control function
-void xDrivetrain::driverControl(pros::Controller controller) {
+void xDrivetrain::driverControl(pros::v5::Controller& controller) {
 	//take the drive code and the driveCurve and driveDivider into account
 	//invert the value if the joystick reads negative
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
@@ -131,6 +152,14 @@ mechanumDrivetrain::mechanumDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pr
 
 //function to control the motor velocities
 void mechanumDrivetrain::setVelocity(double forwardVel, double strafeVel, double turnVel) {
+	//if statements to keep the values within the -127 to 127 range
+	if (forwardVel > 127) forwardVel = 127;
+	if (forwardVel < -127) forwardVel = -127;
+	if (strafeVel > 127) strafeVel = 127;
+	if (strafeVel < -127) strafeVel = -127;
+	if (turnVel > 127) turnVel = 127;
+		
+
 	//calculate the motor speeds based on how an mechanum drive should properly work
 	double frontLeftSpeed = forwardVel + strafeVel + turnVel;
 	double frontRightSpeed = forwardVel - strafeVel - turnVel;
@@ -146,7 +175,7 @@ void mechanumDrivetrain::setVelocity(double forwardVel, double strafeVel, double
 
 
 //driver control function
-void mechanumDrivetrain::driverControl(pros::Controller controller) {
+void mechanumDrivetrain::driverControl(pros::v5::Controller& controller) {
 	//take the drive code and the driveCurve and driveDivider into account
 	//invert the value if the joystick reads negative
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
@@ -158,3 +187,4 @@ void mechanumDrivetrain::driverControl(pros::Controller controller) {
 	//set the drive velocity
 	setVelocity(forward, strafe, turn);
 }
+

@@ -117,7 +117,7 @@ class tankDrivetrain : public driveFrame {
 		 * myDrivetrain.driverControl(master);
 		 * @endcode
 		 */
-		void driverControl(pros::Controller controller);
+		void driverControl(pros::v5::Controller& controller);
 
 };
 
@@ -167,7 +167,7 @@ class xDrivetrain : public driveFrame {
 		 * myDrivetrain.driverControl(master);
 		 * @endcode
 		 */
-    	void driverControl(pros::Controller controller);
+    	void driverControl(pros::v5::Controller& controller);
 };
 
 /**
@@ -216,7 +216,7 @@ class mechanumDrivetrain : public driveFrame {
 		 * myDrivetrain.driverControl(master);
 		 * @endcode
 		 */
-    	void driverControl(pros::Controller controller);
+    	void driverControl(pros::v5::Controller& controller);
 };
 
 #endif //DRIVETRAIN_HPP

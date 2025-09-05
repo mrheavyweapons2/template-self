@@ -31,38 +31,11 @@ double robotX = 0;
 double robotY = 0;
 double robotTheta = 0;
 
-//SAMPLE TANK DECLARATION
-
 //declare the motor groups
-pros::MotorGroup leftMG({1, -2, 3,-4},GEARSET);
-pros::MotorGroup rightMG({-5, 6, -7,8},GEARSET);
-//declare the drivetrain from drivetrainService.hpp
-tankDrivetrain tank(leftMG, rightMG, //pass the motor groups
-                  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
-                  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
-                  DRIVECURVE, CURVEOFFSET, //curve values
-                  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
-
-
-				  
-//SAMPLE X DRIVE DECLARATION
-
-//declare the motor groups
-pros::MotorGroup frontLeftMG({1, -2},GEARSET);
-pros::MotorGroup backLeftMG({3, -4},GEARSET);
-pros::MotorGroup frontRightMG({-5, 6},GEARSET);
-pros::MotorGroup backRightMG({-7, 8},GEARSET);
-//declare the drivetrain from drivetrainService.hpp
-xDrivetrain xDrive(frontLeftMG, backLeftMG, frontRightMG, backRightMG, //pass the motor groups
-				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
-				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
-				  DRIVECURVE, CURVEOFFSET, //curve values
-				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
-
-//SAMPLE MECHANUM DRIVE
-
-//(uses same motor groups as x drive)
-
+pros::MotorGroup frontLeftMG({1,-2,3},GEARSET);
+pros::MotorGroup backLeftMG({11, -12,13},GEARSET);
+pros::MotorGroup frontRightMG({-4, 9,10},GEARSET);
+pros::MotorGroup backRightMG({-15, 17,-19},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
 mechanumDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //pass the motor groups
 				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
@@ -91,11 +64,11 @@ void autonomous() {}
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
 void opcontrol() {
-	pros::Controller master(pros::E_CONTROLLER_MASTER);
+	pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
 
 	while (true) {
 		//driver control
-        tank.driverControl(master);
+        mechDrive.driverControl(master);
 		pros::delay(20);
 	}
 }
