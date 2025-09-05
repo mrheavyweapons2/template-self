@@ -34,10 +34,10 @@ double robotTheta = 0;
 //declare the motor groups
 pros::MotorGroup frontLeftMG({1,-2,3},GEARSET);
 pros::MotorGroup backLeftMG({11, -12,13},GEARSET);
-pros::MotorGroup frontRightMG({-4, 9,10},GEARSET);
-pros::MotorGroup backRightMG({-15, 17,-19},GEARSET);
+pros::MotorGroup frontRightMG({-4, 9,-10},GEARSET);
+pros::MotorGroup backRightMG({-17, 15,-19},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
-mechanumDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //pass the motor groups
+omniDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //pass the motor groups
 				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
 				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
 				  DRIVECURVE, CURVEOFFSET, //curve values

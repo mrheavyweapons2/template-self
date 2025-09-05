@@ -135,7 +135,7 @@ class tankDrivetrain : public driveFrame {
  *                &robotX, &robotY, &robotTheta);
  * @endcode
  */
-class xDrivetrain : public driveFrame {
+class omniDrivetrain : public driveFrame {
 	private:
 		//declare the motor groups
     	pros::MotorGroup& frontLeftMG;
@@ -152,61 +152,12 @@ class xDrivetrain : public driveFrame {
     	void setVelocity(double forward, double strafe, double turn);
 
 	public:
-    	xDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,
+    	omniDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,
                 	pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup,
                 	double MkP, double MkI, double MkD,
                 	double TkP, double TkI, double TkD,
                 	int driverCurve, int driverOffset,
                 	double* x, double* y, double* theta);
-
-		/**
-		 * Driver control function that takes a controller input and
-		 * sets the motor speeds accordingly.
-		 * @code
-		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
-		 * myDrivetrain.driverControl(master);
-		 * @endcode
-		 */
-    	void driverControl(pros::v5::Controller& controller);
-};
-
-/**
- * @class xDrivetrain
- * @brief Class that handles X drive control schemes, which use four motors (or motor groups) 
- * mounted at 45-degree angles to allow for omnidirectional movement. This class 
- * provides flexible control for X drive robots, supporting various motor configurations
- * and PID tuning for precise movement and turning.
- * @code
- * xDrivetrain yourDrivetrain(frontLeftMG, frontRightMG, backLeftMG, backRightMG,
- *                pidMovementKP, pidMovementKI, pidMovementKD,
- *                pidTurnKP, pidTurnKI, pidTurnKD,
- *                driveCurve, curveOffset,
- *                &robotX, &robotY, &robotTheta);
- * @endcode
- */
-class mechanumDrivetrain : public driveFrame {
-	private:
-		//declare the motor groups
-    	pros::MotorGroup& frontLeftMG;
-    	pros::MotorGroup& frontRightMG;
-    	pros::MotorGroup& backLeftMG;
-    	pros::MotorGroup& backRightMG;
-
-		//declare the values for the sticks
-    	double leftStick;
-    	double rightStick;
-    	double strafeStick;
-
-		//function that sets the velocity
-    	void setVelocity(double forward, double strafe, double turn);
-
-	public:
-    	mechanumDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup,
-                			pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup,
-                			double MkP, double MkI, double MkD,
-                			double TkP, double TkI, double TkD,
-                			int driverCurve, int driverOffset,
-                			double* x, double* y, double* theta);
 
 		/**
 		 * Driver control function that takes a controller input and
