@@ -43,6 +43,11 @@ omniDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //p
 				  DRIVECURVE, CURVEOFFSET, //curve values
 				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
 
+//declare other motors
+pros::Motor intakeMotorFront(-7, GEARSET);
+pros::Motor intakeMotorRear(14, GEARSET);
+
+
 //SAMPLE FILE LOGGER DECLARATION
 fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 
@@ -69,6 +74,14 @@ void opcontrol() {
 	while (true) {
 		//driver control
         mechDrive.driverControl(master);
+		//if trigger R1 is pressed, run the intake motors forward
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
+			intakeMotorFront.move(127);
+			intakeMotorRear.move(127);
+		} else {
+			intakeMotorFront.move(0);
+			intakeMotorRear.move(0);
+		}
 		pros::delay(20);
 	}
 }

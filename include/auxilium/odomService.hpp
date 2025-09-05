@@ -15,7 +15,33 @@
 //none yet
 
 
-//implementation here
+/**
+ * @class odomFrame
+ * @brief Superclass that handles a couple function declarations, as well as
+ * private variables that are shared between the different odometry
+ * subclasses. This class should not be used directly, as it does not hold
+ * any implementation of odometry control.
+ */
+ class odomFrame {
+    protected:
+        //declare any shared variables or functions for odometry here
+
+    public:
+        //constructor for the superclass
+        odomFrame() {}
+
+};
+
+class mechanumBasicOdom : public odomFrame {
+    private:
+        //declare any private variables or functions for mechanum odometry here
+
+    public:
+        //constructor for mechanum odometry
+        mechanumBasicOdom() : odomFrame() {}
+
+        //declare any public functions for mechanum odometry here
+};
 
 
 #endif // ODOMSERVICE_HPP
