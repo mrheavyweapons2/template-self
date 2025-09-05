@@ -71,8 +71,6 @@ odomSetup odomStruct = {leftFrontEncoder, rightFrontEncoder, backLeftEncoder, ba
 						robotX, robotY, robotTheta,
 						WHEELDIAMETER, GEARRATIO};
 
-pros::Task odomTask(mechBasicOdom, (void*)&odomStruct, "Odom Task");
-
 //declare other motors
 pros::Motor intakeMotorFront(-7, GEARSET);
 pros::Motor intakeMotorRear(14, GEARSET);
@@ -86,6 +84,8 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
+
+	pros::Task odomTask(mechBasicOdom, (void*)&odomStruct, "Odom Task");
 }
 
 //prebuilt function that runs when the robot is disabled (people use this?)
@@ -112,6 +112,11 @@ void opcontrol() {
 			intakeMotorFront.move(0);
 			intakeMotorRear.move(0);
 		}
+		//print the x y and theta of the robot
+		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
+		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());
+		pros::lcd::set_text(4, ("Theta: " + std::to_string(robotTheta)).c_str());
+		//delay for loop
 		pros::delay(20);
 	}
 }
