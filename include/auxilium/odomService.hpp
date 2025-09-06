@@ -16,6 +16,6 @@
 
 struct odomSetup;
 
-void mechBasicOdom( void* odomStruct);
+void mechBasicOdom(void* param);
 
 #endif // ODOMSERVICE_HPP

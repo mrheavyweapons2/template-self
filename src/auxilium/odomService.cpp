@@ -20,9 +20,9 @@ struct odomSetup {
 };
 
 //implementation of mechanum basic odometry
-void mechBasicOdom( void* &odomStruct) {
+void mechBasicOdom(void* param) {
     //cast the void pointer to the odomSetup struct
-    struct odomSetup* variables = (struct odomSetup*)odomStruct;
+    odomSetup* variables = static_cast<odomSetup*>(param);
 
     //declare holders for the last values for the encoders
     double lastLeftFront = 0;

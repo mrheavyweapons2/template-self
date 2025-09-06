@@ -72,8 +72,9 @@ odomSetup odomStruct = {leftFrontEncoder, rightFrontEncoder, backLeftEncoder, ba
 						WHEELDIAMETER, GEARRATIO};
 
 //declare other motors
-pros::Motor intakeMotorFront(-7, GEARSET);
+pros::Motor intakeMotorFront(7, GEARSET);
 pros::Motor intakeMotorRear(14, GEARSET);
+pros::Motor intakeMotorTop(6, GEARSET);
 
 
 //SAMPLE FILE LOGGER DECLARATION
@@ -85,7 +86,7 @@ void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
 
-	pros::Task odomTask(mechBasicOdom, (void*)&odomStruct, "Odom Task");
+	pros::Task odomTask(mechBasicOdom, &odomStruct, "Odom Task");
 }
 
 //prebuilt function that runs when the robot is disabled (people use this?)
@@ -107,9 +108,19 @@ void opcontrol() {
 		//if trigger R1 is pressed, run the intake motors forward
 		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
 			intakeMotorFront.move(127);
-			intakeMotorRear.move(127);
+			intakeMotorTop.move(127);
 		} else {
 			intakeMotorFront.move(0);
+			intakeMotorTop.move(0);
+		}
+
+		//if trigger L1 is pressed, run the rear intake forward
+		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
+			intakeMotorRear.move(127);
+		//if trigger L2 is pressed, run the rear intake backwards
+		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
+			intakeMotorRear.move(-127);
+		} else {
 			intakeMotorRear.move(0);
 		}
 		//print the x y and theta of the robot
