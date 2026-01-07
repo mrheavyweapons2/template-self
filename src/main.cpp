@@ -38,8 +38,8 @@ double robotY = 0;
 double robotTheta = 0;
 
 //declare the motor groups
-pros::MotorGroup leftMG({1,-2,3},GEARSET);
-pros::MotorGroup rightMG({-4, 5,-6},GEARSET);
+pros::MotorGroup rightMG({1,-2,3},GEARSET);
+pros::MotorGroup leftMG({-4, 5,-6},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
@@ -48,21 +48,34 @@ tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   &robotX, &robotY, &robotTheta); //pointers for robot position
 
 //declare odometry objects
-pros::Motor leftEnc(1);
-pros::Motor rightEnc(-4);
+pros::Motor leftEnc(-4);
+pros::Motor rightEnc(1);
 pros::Imu imuSensor(7);
 
 //declare the odometry system
 encoder2imu1ODOM odomSystem(leftEnc, rightEnc, imuSensor,
-                            &robotX, &robotY, &robotTheta);
+                            &robotX, &robotY, &robotTheta,
+							WHEELDIAMETER, GEARRATIO);
 
 //SAMPLE FILE LOGGER DECLARATION
 fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 
+//helper function to run the odom loop
+	void odomLoop(void* param) {
+		while (true) {
+			//calculate the new position
+			odomSystem.calculate();
+			//delay for loop
+			pros::delay(20);
+		}
+	}
 
 //prebuilt function that runs as soon as the program starts
 void initialize() {
 	pros::lcd::initialize();
+	//create a new thread and initialize the odom loop
+	pros::Task odomTask(odomLoop, (void*)"PROS", "Odom Task");
+	
 }
 
 //prebuilt function that runs when the robot is disabled (people use this?)
@@ -81,7 +94,7 @@ void opcontrol() {
 	//main driver control loop
 	while (true) {
 		//driver control
-        tankDrive.driverControlTank(master);		
+        tankDrive.driverControlTank(master);	
 		//print the x y and theta of the robot
 		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
 		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());

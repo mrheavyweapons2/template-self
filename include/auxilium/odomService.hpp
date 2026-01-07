@@ -27,6 +27,9 @@ class odomFoundation {
         double* robotX;
         double* robotY;
         double* robotTheta;
+
+        double GEARRATIO;
+        double WHEELDIAMETER;
         
         /**
          * @brief Constructor for the odomFoundation class
@@ -34,7 +37,7 @@ class odomFoundation {
          * @param y Pointer to the robot's Y position variable
          * @param theta Pointer to the robot's Theta (heading) position variable
          */
-        odomFoundation(double* x, double* y, double* theta);
+        odomFoundation(double* x, double* y, double* theta, double gearRatio, double wheelDiameter);
 
         /**
          * @brief Virtual function that updates the robot's 
@@ -76,7 +79,15 @@ class odomFoundation {
          * @param theta Pointer to the robot's Theta (heading) position variable
          */
         encoder2imu1ODOM(pros::Motor& leftMotorEnc, pros::Motor& rightMotorEnc, pros::Imu& imu,
-                         double* x, double* y, double* theta);
+                         double* x, double* y, double* theta,
+                         double gearRatio, double wheelDiameter);
+
+         /**
+         * @brief Function that runs the odometry calculations and updates the robot's position
+         * based on encoder and imu readings. This function should be called in a loop to continuously
+         * update the robot's position and ensure accuracy.
+         */
+        void calculate();
 
 };
 

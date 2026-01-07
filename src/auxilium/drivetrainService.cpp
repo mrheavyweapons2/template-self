@@ -1,7 +1,7 @@
 //includes from pros or other necessary libraries
 #include "pros/misc.h"
 #include "pros/motor_group.hpp"
-#include <cmath>
+#include "math.h"
 
 //header file
 #include "auxilium/drivetrainService.hpp"
@@ -90,7 +90,7 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	// arcade drive
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
 	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
-	double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X), driveCurve)/driveOffset;
+	double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X), driveCurve)/driveOffset;
 	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) < 0 && (turn > 0)) turn = -turn;
 	// set the drive velocity
 	setVelocity(forward, turn);
