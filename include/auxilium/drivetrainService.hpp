@@ -109,7 +109,7 @@ class tankDrivetrain : public driveFrame {
                        double* x, double* y, double* theta); 
 
 		/**
-		 * Driver control function that takes a controller input and
+		 * driver control function that takes a controller input and
 		 * sets the motor speeds accordingly.
 		 * @param controller The controller object to read driver input from.
 		 * @code
@@ -117,7 +117,18 @@ class tankDrivetrain : public driveFrame {
 		 * myDrivetrain.driverControl(master);
 		 * @endcode
 		 */
-		void driverControl(pros::v5::Controller& controller);
+		void driverControlTank(pros::v5::Controller& controller);
+
+		/**
+		 * the second control function that takes a controller input and
+		 * sets the motor speeds accordingly (does arcade instead of tank drive).
+		 * @param controller The controller object to read driver input from.
+		 * @code
+		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
+		 * myDrivetrain.driverControl(master);
+		 * @endcode
+		 */
+		void driverControlArcade(pros::v5::Controller& controller);
 
 };
 

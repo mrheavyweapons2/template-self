@@ -74,8 +74,8 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 	rightMG.move(forward + turn);
 }
 
-// Driver control function that runs a tank drive scheme
-void tankDrivetrain::driverControl(pros::v5::Controller& controller) {
+//driver control function that runs a tank drive scheme
+void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	// dih drive
 	leftStick = pow((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y)), driveCurve) / driveOffset;
 	if ((controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0) && (leftStick > 0)) leftStick = -leftStick;
@@ -84,6 +84,17 @@ void tankDrivetrain::driverControl(pros::v5::Controller& controller) {
 	leftMG.move(leftStick);
 	rightMG.move(rightStick);
 }
+
+//driver control function that runs an arcade drive scheme
+ void tankDrivetrain::driverControlArcade(pros::v5::Controller& controller) {
+	// arcade drive
+	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
+	double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X), driveCurve)/driveOffset;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) < 0 && (turn > 0)) turn = -turn;
+	// set the drive velocity
+	setVelocity(forward, turn);
+ }
 
 
 //constructor for xDrivetrain here

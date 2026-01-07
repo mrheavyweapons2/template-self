@@ -8,7 +8,6 @@
 //include auxilium implementation
 #include "auxilium/drivetrainService.hpp"
 #include "auxilium/liasonService.hpp"
-#include "auxilium/odomService.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
@@ -36,45 +35,15 @@ double robotY = 0;
 double robotTheta = 0;
 
 //declare the motor groups
-pros::MotorGroup frontLeftMG({1,-2,3},GEARSET);
-pros::MotorGroup backLeftMG({11, -12,13},GEARSET);
-pros::MotorGroup frontRightMG({-4, 9,-10},GEARSET);
-pros::MotorGroup backRightMG({-17, 15,-19},GEARSET);
+pros::MotorGroup leftMG({1,-2,3},GEARSET);
+pros::MotorGroup rightMG({-4, 9,-10},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
-omniDrivetrain mechDrive(frontLeftMG, frontRightMG, backLeftMG, backRightMG, //pass the motor groups
-				  drivetrainMKP, drivetrainMKI, drivetrainMKD, //movement PID values
-				  drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning PID values
-				  DRIVECURVE, CURVEOFFSET, //curve values
-				  &robotX, &robotY, &robotTheta); //pointers to the robots position variables
+tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
+						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
+						   drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning pid values
+						   DRIVECURVE, CURVEOFFSET, //driver control curve values
+						   &robotX, &robotY, &robotTheta); //pointers for robot position
 
-//declare 1 motor from each motorgroup to function as motor encoders
-pros::Motor leftFrontEncoder(1, GEARSET);
-pros::Motor rightFrontEncoder(-4, GEARSET);
-pros::Motor backLeftEncoder(11, GEARSET);
-pros::Motor backRightEncoder(-17, GEARSET);
-
-
-//declare the mechanum odometry function as a task
-struct odomSetup {
-	pros::Motor& leftFrontEncoder;
-	pros::Motor& rightFrontEncoder;
-	pros::Motor& backLeftEncoder;
-	pros::Motor& backRightEncoder;
-	double& robotX;
-	double& robotY;
-	double& robotTheta;
-	double wheelDiameter;
-	double gearRatio;
-};
-
-odomSetup odomStruct = {leftFrontEncoder, rightFrontEncoder, backLeftEncoder, backRightEncoder,
-						robotX, robotY, robotTheta,
-						WHEELDIAMETER, GEARRATIO};
-
-//declare other motors
-pros::Motor intakeMotorFront(7, GEARSET);
-pros::Motor intakeMotorRear(14, GEARSET);
-pros::Motor intakeMotorTop(6, GEARSET);
 
 
 //SAMPLE FILE LOGGER DECLARATION
@@ -85,8 +54,6 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 void initialize() {
 	pros::lcd::initialize();
 	pros::lcd::set_text(1, "Hello PROS User!");
-
-	pros::Task odomTask(mechBasicOdom, &odomStruct, "Odom Task");
 }
 
 //prebuilt function that runs when the robot is disabled (people use this?)
@@ -100,29 +67,12 @@ void autonomous() {}
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
 void opcontrol() {
+	//declare the master controller
 	pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
-
+	//main driver control loop
 	while (true) {
 		//driver control
-        mechDrive.driverControl(master);
-		//if trigger R1 is pressed, run the intake motors forward
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_R1)) {
-			intakeMotorFront.move(127);
-			intakeMotorTop.move(127);
-		} else {
-			intakeMotorFront.move(0);
-			intakeMotorTop.move(0);
-		}
-
-		//if trigger L1 is pressed, run the rear intake forward
-		if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L1)) {
-			intakeMotorRear.move(127);
-		//if trigger L2 is pressed, run the rear intake backwards
-		} else if (master.get_digital(pros::E_CONTROLLER_DIGITAL_L2)) {
-			intakeMotorRear.move(-127);
-		} else {
-			intakeMotorRear.move(0);
-		}
+        tankDrive.driverControlTank(master);		
 		//print the x y and theta of the robot
 		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
 		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());
