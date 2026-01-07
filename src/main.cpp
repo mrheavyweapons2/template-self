@@ -23,9 +23,11 @@
 #define drivetrainTKI 0.001 //integral for turning
 #define drivetrainTKD 0.1 //derivative for turning
 
+//driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
 
+//odometry settings
 #define WHEELDIAMETER 2.75 //wheel diameter for odometry (in inches)
 #define GEARRATIO 36.0/36.0 //gear ratio for odometry (output speed / input speed)
 
@@ -36,7 +38,7 @@ double robotTheta = 0;
 
 //declare the motor groups
 pros::MotorGroup leftMG({1,-2,3},GEARSET);
-pros::MotorGroup rightMG({-4, 9,-10},GEARSET);
+pros::MotorGroup rightMG({-4, 5,-6},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
