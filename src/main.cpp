@@ -53,7 +53,6 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 //prebuilt function that runs as soon as the program starts
 void initialize() {
 	pros::lcd::initialize();
-	pros::lcd::set_text(1, "Hello PROS User!");
 }
 
 //prebuilt function that runs when the robot is disabled (people use this?)
