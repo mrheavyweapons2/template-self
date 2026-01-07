@@ -8,6 +8,7 @@
 //include auxilium implementation
 #include "auxilium/drivetrainService.hpp"
 #include "auxilium/liasonService.hpp"
+#include "auxilium/odomService.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
@@ -46,7 +47,14 @@ tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   DRIVECURVE, CURVEOFFSET, //driver control curve values
 						   &robotX, &robotY, &robotTheta); //pointers for robot position
 
+//declare odometry objects
+pros::Motor leftEnc(1);
+pros::Motor rightEnc(-4);
+pros::Imu imuSensor(7);
 
+//declare the odometry system
+encoder2imu1ODOM odomSystem(leftEnc, rightEnc, imuSensor,
+                            &robotX, &robotY, &robotTheta);
 
 //SAMPLE FILE LOGGER DECLARATION
 fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
