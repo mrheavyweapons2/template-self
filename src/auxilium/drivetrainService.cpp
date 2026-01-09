@@ -103,7 +103,25 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	//get the starting values
 	double distanceOffset = *totalDistance;
 	double headingTarget = *theta;
-	//main loop here later
+	//main loop
+	while (true) {
+		//calculate the forward speed from the PID
+		double forwardSpeed = PID(MkP, MkI, MkD, distance + distanceOffset, *totalDistance);
+		//cap the forward speed to the max speed
+		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
+		if (forwardSpeed < -maxSpeed) forwardSpeed = -maxSpeed;
+		//calculate the turn speed from the PID if locking heading
+		double turnSpeed = 0;
+		if (lockHeading) {
+			turnSpeed = PID(TkP, TkI, TkD, headingTarget, *theta);
+		}
+		//if the distance is within the minimum threshold, break the loop
+		if (fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) break;
+		//set the motor speeds
+		setVelocity(forwardSpeed, turnSpeed);
+		//delay for loop
+		pros::delay(20);
+	}
  }
 
  //autonomous function that turns the robot to a set angle

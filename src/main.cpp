@@ -96,6 +96,8 @@ void autonomous() {}
 void opcontrol() {
 	//declare the master controller
 	pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
+	//test code here
+	tankDrive.autoTurnToHeading(90, 127);
 	//main driver control loop
 	while (true) {
 		//driver control

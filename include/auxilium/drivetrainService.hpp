@@ -138,7 +138,6 @@ class tankDrivetrain : public driveFrame {
 		 * autonomous function that drives the robot forward a set distance
 		 * @param distance The distance to drive forward in inches
 		 * @param maxSpeed The maximum speed to drive at (0-127),
-		 * if the distance value is negative, max speed should be a negative value as well
 		 * @param lockHeading optional parameter that locks the robots heading during the drive
 		 */
 		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false);
