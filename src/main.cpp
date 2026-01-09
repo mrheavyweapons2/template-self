@@ -3,6 +3,8 @@
 //include PROS and other necessary libraries
 #include "main.h"
 #include "pros/motor_group.hpp"
+#include "pros/imu.hpp"
+#include "pros/motors.hpp"
 #include <string>
 
 //include auxilium implementation
@@ -38,8 +40,8 @@ double robotY = 0;
 double robotTheta = 0;
 
 //declare the motor groups
-pros::MotorGroup rightMG({1,-2,3},GEARSET);
-pros::MotorGroup leftMG({-4, 5,-6},GEARSET);
+pros::MotorGroup leftMG({-1,-2,3},GEARSET);
+pros::MotorGroup rightMG({-4, 5,6},GEARSET);
 //declare the drivetrain from drivetrainService.hpp
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
@@ -73,6 +75,8 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 //prebuilt function that runs as soon as the program starts
 void initialize() {
 	pros::lcd::initialize();
+	//increase the IMU refresh rate
+	imuSensor.set_data_rate(5);
 	//create a new thread and initialize the odom loop
 	pros::Task odomTask(odomLoop, (void*)"PROS", "Odom Task");
 	
@@ -94,7 +98,7 @@ void opcontrol() {
 	//main driver control loop
 	while (true) {
 		//driver control
-        tankDrive.driverControlTank(master);	
+        tankDrive.driverControlArcade(master);
 		//print the x y and theta of the robot
 		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
 		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());

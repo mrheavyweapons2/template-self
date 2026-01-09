@@ -70,8 +70,8 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 	if (turn > 127) turn = 127;
 	if (turn < -127) turn = -127;
 	// set the motor values
-	leftMG.move(forward - turn);
-	rightMG.move(forward + turn);
+	leftMG.move(forward + turn);
+	rightMG.move(forward - turn);
 }
 
 //driver control function that runs a tank drive scheme
@@ -91,7 +91,7 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
 	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
 	double turn = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X), driveCurve)/driveOffset;
-	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_RIGHT_X) < 0 && (turn > 0)) turn = -turn;
+	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) < 0 && (turn > 0)) turn = -turn;
 	// set the drive velocity
 	setVelocity(forward, turn);
  }

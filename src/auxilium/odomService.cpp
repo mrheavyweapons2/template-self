@@ -8,7 +8,7 @@
 #include "auxilium/odomService.hpp"
 
 //define some "magic" numbers needed for calculations
-#define MILLIMETERS_PER_INCH 25.4
+#define MILLIMETER_ADJUSTMENT 30.48
 
 //constructor for the base odomFoundation class
 odomFoundation::odomFoundation(double* x, double* y, double* theta, double gearRatio, double wheelDiameter) {
@@ -53,8 +53,8 @@ void encoder2imu1ODOM::calculate() {
     previousRight = currentRight;
 
     //calculate the distance traveled by each wheel (in inches)
-    double leftDistance = (deltaLeft / 360.0) * (MILLIMETERS_PER_INCH * GEARRATIO * WHEELDIAMETER * 3.14159);
-    double rightDistance = (deltaRight / 360.0) * (MILLIMETERS_PER_INCH * GEARRATIO * WHEELDIAMETER * 3.14159);
+    double leftDistance = (deltaLeft / 360.0) * (MILLIMETER_ADJUSTMENT * GEARRATIO * WHEELDIAMETER * 3.14159);
+    double rightDistance = (deltaRight / 360.0) * (MILLIMETER_ADJUSTMENT * GEARRATIO * WHEELDIAMETER * 3.14159);
 
 
     //calculate the average distance traveled
