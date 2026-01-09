@@ -99,9 +99,12 @@ class tankDrivetrain : public driveFrame {
 		pros::MotorGroup& rightMG;
 
 		//stick values for driver control (notice the drop in quality with the text? 
-		// i just realized i dont need to to make long ass comments for private variables)
 		double leftStick;
 		double rightStick;
+
+		//variables for when to cut off autonomous functions
+		double autoTurnMin;
+		double autoDriveMin;
 
         //function that takes the turn and forward values and sets the motor speeds accordingly
 		void setVelocity(int forward, int turn);

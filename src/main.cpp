@@ -71,7 +71,7 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 			//calculate the new position
 			odomSystem.calculate();
 			//delay for loop
-			pros::delay(20);
+			pros::delay(10);
 		}
 	}
 

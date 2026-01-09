@@ -61,7 +61,8 @@ tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGrou
                                int driverCurve, int driverOffset, //driver exponential curve values
                                double* x, double* y, double* theta, double* totalDistance) //pointers that relay the robots position
     : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta, totalDistance),
-      leftMG(leftMotorgroup), rightMG(rightMotorgroup) {} //initialize the motor groups
+      leftMG(leftMotorgroup), rightMG(rightMotorgroup), //initialize the motor groups
+	  autoTurnMin(autoTurnMin), autoDriveMin(autoDriveMin) {} //initialize the minimum auto cutoffs
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
 void tankDrivetrain::setVelocity(int forward, int turn) {
@@ -101,11 +102,27 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
  void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading) {
 	//get the starting values
 	double distanceOffset = *totalDistance;
-	double headingOffset = *theta;
+	double headingTarget = *theta;
+	//main loop here later
  }
 
  //autonomous function that turns the robot to a set angle
- void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {}
+ void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
+	//main loop
+	while (true) {
+		//calculate the turn speed from the PID
+		double turnSpeed = PID(TkP, TkI, TkD, angle, *theta);
+		//cap the turn speed to the max speed
+		if (turnSpeed > maxSpeed) turnSpeed = maxSpeed;
+		if (turnSpeed < -maxSpeed) turnSpeed = -maxSpeed;
+		//if the turn speed is within the minimum threshold, break the loop
+		if (fabs(angle - *theta) < autoTurnMin) break;
+		//set the motor speeds
+		setVelocity(0, turnSpeed);
+		//delay for loop
+		pros::delay(20);
+	}
+ }
 
 //autonomous function that returns true/false based on if the robot is moving
 bool tankDrivetrain::isStopped() {return false;}
