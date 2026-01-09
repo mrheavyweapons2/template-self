@@ -24,6 +24,9 @@
 #define drivetrainTKI 0.001 //integral for turning
 #define drivetrainTKD 0.1 //derivative for turning
 
+#define drivetrainAutoDriveMin 10 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
+#define drivetrainAutoTurnMin 2 //minimum angle (in degrees) for the auto turn function to consider itself at the target
+
 //driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
@@ -36,6 +39,7 @@
 double robotX = 0;
 double robotY = 0;
 double robotTheta = 0;
+double totalDistance = 0; //total distance traveled by the robot (in millimeters)
 
 //declare the motor groups
 pros::MotorGroup rightMG({1,-2,3},GEARSET);
@@ -44,8 +48,9 @@ pros::MotorGroup leftMG({-4, 5,-6},GEARSET);
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
 						   drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning pid values
+						   drivetrainAutoTurnMin, drivetrainAutoDriveMin, //minimum distance values for autonomous functions
 						   DRIVECURVE, CURVEOFFSET, //driver control curve values
-						   &robotX, &robotY, &robotTheta); //pointers for robot position
+						   &robotX, &robotY, &robotTheta, &totalDistance); //pointers for robot position
 
 //declare odometry objects
 pros::Motor leftEnc(-4);
@@ -54,7 +59,7 @@ pros::Imu imuSensor(7);
 
 //declare the odometry system
 encoder2imu1ODOM odomSystem(leftEnc, rightEnc, imuSensor,
-                            &robotX, &robotY, &robotTheta,
+                            &robotX, &robotY, &robotTheta, &totalDistance,
 							WHEELDIAMETER, GEARRATIO);
 
 //SAMPLE FILE LOGGER DECLARATION

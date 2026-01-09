@@ -13,7 +13,6 @@
 
 //include neccessary PROS libraries
 #include "pros/imu.hpp"
-#include "pros/rotation.hpp"
 #include "pros/motors.hpp"
 
 /**
@@ -37,7 +36,8 @@ class odomFoundation {
          * @param y Pointer to the robot's Y position variable
          * @param theta Pointer to the robot's Theta (heading) position variable
          */
-        odomFoundation(double* x, double* y, double* theta, double gearRatio, double wheelDiameter);
+        odomFoundation(double* x, double* y, double* theta, 
+                        double gearRatio, double wheelDiameter);
 
         /**
          * @brief Virtual function that updates the robot's 
@@ -53,6 +53,7 @@ class odomFoundation {
 /**
  * @class encoder2imu1ODOM
  * @brief Class for odometry using 2 encoders and 1 imu sensor for position tracking,
+ * common odometry setup for tank drive bots that allows for somewhat accurate position tracking (its better than nothing)
  */
  class encoder2imu1ODOM : public odomFoundation {
     private:
@@ -61,12 +62,12 @@ class odomFoundation {
         pros::Motor& leftEncoder;
         pros::Motor& rightEncoder;
 
-        //declare the wheelbase width
-        double wheelbaseWidth;
-
         //previous encoder values
         double previousLeft;
         double previousRight;
+
+        //total distance traveled
+        double* totalDistance;
 
     public:
         /**
@@ -79,7 +80,7 @@ class odomFoundation {
          * @param theta Pointer to the robot's Theta (heading) position variable
          */
         encoder2imu1ODOM(pros::Motor& leftMotorEnc, pros::Motor& rightMotorEnc, pros::Imu& imu,
-                         double* x, double* y, double* theta,
+                         double* x, double* y, double* theta, double* totalDistance,
                          double gearRatio, double wheelDiameter);
 
          /**
