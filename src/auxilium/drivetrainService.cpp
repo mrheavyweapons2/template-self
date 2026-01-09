@@ -14,6 +14,7 @@ driveFrame::driveFrame(double MkP, double MkI, double MkD,
                        double* x, double* y, double* theta, double* totalDistance)
     : MkP(MkP), MkI(MkI), MkD(MkD),
       TkP(TkP), TkI(TkI), TkD(TkD),
+	  x(x), y(y), theta(theta), totalDistance(totalDistance),
       driveCurve(driverCurve), driveOffset(driverOffset),
       previousError(0), integralSec(0), integralLimit(0)
 {
@@ -134,7 +135,7 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 		if (turnSpeed > maxSpeed) turnSpeed = maxSpeed;
 		if (turnSpeed < -maxSpeed) turnSpeed = -maxSpeed;
 		//if the turn speed is within the minimum threshold, break the loop
-		if (fabs(angle - *theta) < autoTurnMin) break;
+		//if (fabs(angle - *theta) < autoTurnMin) break;
 		//set the motor speeds
 		setVelocity(0, turnSpeed);
 		//delay for loop

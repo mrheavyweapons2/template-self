@@ -11,6 +11,7 @@
 #include "auxilium/drivetrainService.hpp"
 #include "auxilium/liasonService.hpp"
 #include "auxilium/odomService.hpp"
+#include "pros/rtos.hpp"
 
 
 //simple settings that can be changed up here instead of looking for it in the program
@@ -73,12 +74,13 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 			//calculate the new position
 			odomSystem.calculate();
 			//delay for loop
-			pros::delay(10);
+			pros::delay(20);
 		}
 	}
 
 //prebuilt function that runs as soon as the program starts
 void initialize() {
+	//initialize the LCD
 	pros::lcd::initialize();
 	//increase the IMU refresh rate
 	imuSensor.set_data_rate(5);
@@ -94,14 +96,15 @@ void disabled() {}
 void competition_initialize() {}
 
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
-void autonomous() {}
+void autonomous() {
+	//test turn here
+	tankDrive.autoTurnToHeading(90, 127);
+}
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
 void opcontrol() {
 	//declare the master controller
 	pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
-	//test code here
-	tankDrive.autoTurnToHeading(90, 127);
 	//main driver control loop
 	while (true) {
 		//driver control

@@ -35,7 +35,8 @@ encoder2imu1ODOM::encoder2imu1ODOM(pros::Motor& leftMotor, pros::Motor& rightMot
                                    : odomFoundation(x, y, theta, gearRatio, wheelDiameter),
                                     leftEncoder(leftMotor),
                                     rightEncoder(rightMotor),
-                                    imuSensor(imu) {}
+                                    imuSensor(imu),
+                                    totalDistance(totalDistance) {}
 
 //calculate function for encoder2imu1ODOM class
 void encoder2imu1ODOM::calculate() {
@@ -49,8 +50,8 @@ void encoder2imu1ODOM::calculate() {
     previousLeft = currentLeft;
     previousRight = currentRight;
     //calculate the distance traveled by each wheel (in inches)
-    double leftDistance = (deltaLeft / 360.0) * (MILLIMETERS_PER_INCH * GEARRATIO * WHEELDIAMETER * 3.14159);
-    double rightDistance = (deltaRight / 360.0) * (MILLIMETERS_PER_INCH * GEARRATIO * WHEELDIAMETER * 3.14159);
+    double leftDistance = (deltaLeft / 360.0) * (MILLIMETER_ADJUSTMENT * GEARRATIO * WHEELDIAMETER * 3.14159);
+    double rightDistance = (deltaRight / 360.0) * (MILLIMETER_ADJUSTMENT * GEARRATIO * WHEELDIAMETER * 3.14159);
 
 
     //calculate the average distance traveled
