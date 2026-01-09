@@ -45,6 +45,12 @@
 		double TkI;
 		double TkD;
 
+		//robot pose pointers
+		double* x;
+		double* y;
+		double* theta;
+		double* totalDistance;
+
         //pid function that takes the setpoint and returns a desired value to set the motors to
         double PID(double kP, double kI, double kD, double target, double current);
 
@@ -55,7 +61,7 @@
 		driveFrame(double MkP, double MkI, double MkD, //movement PID values
 				   double TkP, double TkI, double TkD, //turning PID values
 				   int driverCurve, int driverOffset, //driver exponential curve values
-				   double* x, double* y, double* theta); // robot pose variables
+				   double* x, double* y, double* theta, double* totalDistance); // robot pose variables
  };
 
 
@@ -93,9 +99,12 @@ class tankDrivetrain : public driveFrame {
 		pros::MotorGroup& rightMG;
 
 		//stick values for driver control (notice the drop in quality with the text? 
-		// i just realized i dont need to to make long ass comments for private variables)
 		double leftStick;
 		double rightStick;
+
+		//variables for when to cut off autonomous functions
+		double autoTurnMin;
+		double autoDriveMin;
 
         //function that takes the turn and forward values and sets the motor speeds accordingly
 		void setVelocity(int forward, int turn);
@@ -105,17 +114,14 @@ class tankDrivetrain : public driveFrame {
 		tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
                        double MkP, double MkI, double MkD,
                        double TkP, double TkI, double TkD,
-                       int driverCurve, int driverOffset,
-                       double* x, double* y, double* theta); 
+                       double autoTurnMin, double autoDriveMin, 
+					   int driverCurve, int driverOffset,
+                       double* x, double* y, double* theta, double* totalDistance); 
 
 		/**
 		 * driver control function that takes a controller input and
 		 * sets the motor speeds accordingly.
 		 * @param controller The controller object to read driver input from.
-		 * @code
-		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
-		 * myDrivetrain.driverControl(master);
-		 * @endcode
 		 */
 		void driverControlTank(pros::v5::Controller& controller);
 
@@ -123,12 +129,32 @@ class tankDrivetrain : public driveFrame {
 		 * the second control function that takes a controller input and
 		 * sets the motor speeds accordingly (does arcade instead of tank drive).
 		 * @param controller The controller object to read driver input from.
-		 * @code
-		 * pros::Controller master(pros::E_CONTROLLER_MASTER);
-		 * myDrivetrain.driverControl(master);
-		 * @endcode
 		 */
 		void driverControlArcade(pros::v5::Controller& controller);
+
+		//the autonomous functions come after this
+
+		/**
+		 * autonomous function that drives the robot forward a set distance
+		 * @param distance The distance to drive forward in inches
+		 * @param maxSpeed The maximum speed to drive at (0-127),
+		 * @param lockHeading optional parameter that locks the robots heading during the drive
+		 */
+		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false);
+
+		/**
+		 * autonomous function that turns the robot to a set angle
+		 * @param angle The angle to turn to in degrees (0-360)
+		 * @param maxSpeed The maximum speed to turn at (0-127)
+		 */
+		void autoTurnToHeading(double angle, double maxSpeed);
+
+		/**
+		 * autonomous function that returns true/false based on if the robot is moving
+		 * @return true if the robot is currently moving, false if it is not
+		 */
+		bool isStopped();
+
 
 };
 
@@ -168,7 +194,7 @@ class omniDrivetrain : public driveFrame {
                 	double MkP, double MkI, double MkD,
                 	double TkP, double TkI, double TkD,
                 	int driverCurve, int driverOffset,
-                	double* x, double* y, double* theta);
+                	double* x, double* y, double* theta, double* totalDistance);
 
 		/**
 		 * Driver control function that takes a controller input and

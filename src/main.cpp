@@ -26,6 +26,9 @@
 #define drivetrainTKI 0.001 //integral for turning
 #define drivetrainTKD 0.1 //derivative for turning
 
+#define drivetrainAutoDriveMin 10 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
+#define drivetrainAutoTurnMin 2 //minimum angle (in degrees) for the auto turn function to consider itself at the target
+
 //driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
 #define CURVEOFFSET 127 //offset for the exponential curve
@@ -38,6 +41,7 @@
 double robotX = 0;
 double robotY = 0;
 double robotTheta = 0;
+double totalDistance = 0; //total distance traveled by the robot (in millimeters)
 
 //declare the motor groups
 pros::MotorGroup leftMG({-1,-2,3},GEARSET);
@@ -46,8 +50,9 @@ pros::MotorGroup rightMG({-4, 5,6},GEARSET);
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
 						   drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning pid values
+						   drivetrainAutoTurnMin, drivetrainAutoDriveMin, //minimum distance values for autonomous functions
 						   DRIVECURVE, CURVEOFFSET, //driver control curve values
-						   &robotX, &robotY, &robotTheta); //pointers for robot position
+						   &robotX, &robotY, &robotTheta, &totalDistance); //pointers for robot position
 
 //declare odometry objects
 pros::Motor leftEnc(-4);
@@ -56,7 +61,7 @@ pros::Imu imuSensor(7);
 
 //declare the odometry system
 encoder2imu1ODOM odomSystem(leftEnc, rightEnc, imuSensor,
-                            &robotX, &robotY, &robotTheta,
+                            &robotX, &robotY, &robotTheta, &totalDistance,
 							WHEELDIAMETER, GEARRATIO);
 
 //SAMPLE FILE LOGGER DECLARATION
@@ -68,7 +73,7 @@ fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 			//calculate the new position
 			odomSystem.calculate();
 			//delay for loop
-			pros::delay(20);
+			pros::delay(10);
 		}
 	}
 
@@ -95,6 +100,8 @@ void autonomous() {}
 void opcontrol() {
 	//declare the master controller
 	pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
+	//test code here
+	tankDrive.autoTurnToHeading(90, 127);
 	//main driver control loop
 	while (true) {
 		//driver control

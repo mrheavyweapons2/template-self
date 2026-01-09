@@ -11,7 +11,7 @@
 driveFrame::driveFrame(double MkP, double MkI, double MkD,
                        double TkP, double TkI, double TkD,
                        int driverCurve, int driverOffset,
-                       double* x, double* y, double* theta)
+                       double* x, double* y, double* theta, double* totalDistance)
     : MkP(MkP), MkI(MkI), MkD(MkD),
       TkP(TkP), TkI(TkI), TkD(TkD),
       driveCurve(driverCurve), driveOffset(driverOffset),
@@ -57,10 +57,12 @@ void driveFrame::resetvariables() {
 tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declare the motorgroups
                                double MkP, double MkI, double MkD, //movement PID values
                                double TkP, double TkI, double TkD, //turning PID values
+							   double autoTurnMin, double autoDriveMin, //minimum distance needed for function cutoffs
                                int driverCurve, int driverOffset, //driver exponential curve values
-                               double* x, double* y, double* theta) //pointers that relay the robots position
-    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta),
-      leftMG(leftMotorgroup), rightMG(rightMotorgroup) {} //initialize the motor groups
+                               double* x, double* y, double* theta, double* totalDistance) //pointers that relay the robots position
+    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta, totalDistance),
+      leftMG(leftMotorgroup), rightMG(rightMotorgroup), //initialize the motor groups
+	  autoTurnMin(autoTurnMin), autoDriveMin(autoDriveMin) {} //initialize the minimum auto cutoffs
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
 void tankDrivetrain::setVelocity(int forward, int turn) {
@@ -96,6 +98,57 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	setVelocity(forward, turn);
  }
 
+ //autonomous function that drives the robot forward a set distance
+ void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading) {
+	//get the starting values
+	double distanceOffset = *totalDistance;
+	double headingTarget = *theta;
+	//main loop
+	while (true) {
+		//calculate the forward speed from the PID
+		double forwardSpeed = PID(MkP, MkI, MkD, distance + distanceOffset, *totalDistance);
+		//cap the forward speed to the max speed
+		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
+		if (forwardSpeed < -maxSpeed) forwardSpeed = -maxSpeed;
+		//calculate the turn speed from the PID if locking heading
+		double turnSpeed = 0;
+		if (lockHeading) {
+			turnSpeed = PID(TkP, TkI, TkD, headingTarget, *theta);
+		}
+		//if the distance is within the minimum threshold, break the loop
+		if (fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) break;
+		//set the motor speeds
+		setVelocity(forwardSpeed, turnSpeed);
+		//delay for loop
+		pros::delay(20);
+	}
+ }
+
+ //autonomous function that turns the robot to a set angle
+ void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
+	//main loop
+	while (true) {
+		//calculate the turn speed from the PID
+		double turnSpeed = PID(TkP, TkI, TkD, angle, *theta);
+		//cap the turn speed to the max speed
+		if (turnSpeed > maxSpeed) turnSpeed = maxSpeed;
+		if (turnSpeed < -maxSpeed) turnSpeed = -maxSpeed;
+		//if the turn speed is within the minimum threshold, break the loop
+		if (fabs(angle - *theta) < autoTurnMin) break;
+		//set the motor speeds
+		setVelocity(0, turnSpeed);
+		//delay for loop
+		pros::delay(20);
+	}
+ }
+
+//autonomous function that returns true/false based on if the robot is moving
+bool tankDrivetrain::isStopped() {return false;}
+
+
+
+
+
 
 //constructor for xDrivetrain here
 omniDrivetrain::omniDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup, //front motor groups
@@ -103,8 +156,8 @@ omniDrivetrain::omniDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::Moto
                          double MkP, double MkI, double MkD, //movement PID values
                          double TkP, double TkI, double TkD, //turning PID values
                          int driverCurve, int driverOffset, //driver exponential curve values
-                         double* x, double* y, double* theta) //pointers that relay the robots position
-    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta),
+                         double* x, double* y, double* theta, double* totalDistance) //pointers that relay the robots position
+    : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta, totalDistance),
       frontLeftMG(frontLeftMotorgroup), //initialize the motor groups
       frontRightMG(frontRightMotorgroup),
       backLeftMG(backLeftMotorgroup),
