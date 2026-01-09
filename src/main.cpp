@@ -2,6 +2,7 @@
 
 //include PROS and other necessary libraries
 #include "main.h"
+#include "liblvgl/llemu.hpp"
 #include "pros/motor_group.hpp"
 #include "pros/imu.hpp"
 #include "pros/motors.hpp"
@@ -19,16 +20,16 @@
 #define GEARSET pros::v5::MotorGears::blue //motor gearset
 
 //defining PID values for movement, as well as turning
-#define drivetrainMKP 1 //proportional for movement
+#define drivetrainMKP 0.75 //proportional for movement
 #define drivetrainMKI 0.001 //integral for movement
-#define drivetrainMKD 0.1 //derivative for movement
+#define drivetrainMKD 3 //derivative for movement
 
-#define drivetrainTKP 1 //proportional for turning
+#define drivetrainTKP 4 //proportional for turning
 #define drivetrainTKI 0.001 //integral for turning
-#define drivetrainTKD 0.1 //derivative for turning
+#define drivetrainTKD 14 //derivative for turning
 
 #define drivetrainAutoDriveMin 10 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
-#define drivetrainAutoTurnMin 2 //minimum angle (in degrees) for the auto turn function to consider itself at the target
+#define drivetrainAutoTurnMin 1.9 //minimum angle (in degrees) for the auto turn function to consider itself at the target
 
 //driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
@@ -57,7 +58,7 @@ tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 
 //declare odometry objects
 pros::Motor leftEnc(-4);
-pros::Motor rightEnc(1);
+pros::Motor rightEnc(-1);
 pros::Imu imuSensor(7);
 
 //declare the odometry system
@@ -69,14 +70,27 @@ encoder2imu1ODOM odomSystem(leftEnc, rightEnc, imuSensor,
 fileLogger logger("/usd/logfile.csv", "Time, X, Y, Theta");
 
 //helper function to run the odom loop
-	void odomLoop(void* param) {
-		while (true) {
-			//calculate the new position
-			odomSystem.calculate();
-			//delay for loop
-			pros::delay(20);
-		}
+void odomLoop(void* param) {
+	while (true) {
+		//calculate the new position
+		odomSystem.calculate();
+		//delay for loop
+		pros::delay(20);
 	}
+}
+
+//helper function to run a print to lcd loop
+void lcdLoop(void* param) {
+	while (true) {
+		//print the x y and theta of the robot
+		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
+		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());
+		pros::lcd::set_text(4, ("Theta: " + std::to_string(robotTheta)).c_str());
+		pros::lcd::set_text(5, ("Test Value: " + std::to_string(leftMG.get_actual_velocity())).c_str());
+		//delay for loop
+		pros::delay(20);
+	}
+}
 
 //prebuilt function that runs as soon as the program starts
 void initialize() {
@@ -86,6 +100,8 @@ void initialize() {
 	imuSensor.set_data_rate(5);
 	//create a new thread and initialize the odom loop
 	pros::Task odomTask(odomLoop, (void*)"PROS", "Odom Task");
+	//create a new thread and initialize the lcd loop
+	pros::Task lcdTask(lcdLoop, (void*)"PROS", "LCD Task");
 	
 }
 
@@ -98,7 +114,7 @@ void competition_initialize() {}
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
 void autonomous() {
 	//test turn here
-	tankDrive.autoTurnToHeading(90, 127);
+	tankDrive.autoDriveDistance(-1800, 75,true);
 }
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
@@ -108,11 +124,7 @@ void opcontrol() {
 	//main driver control loop
 	while (true) {
 		//driver control
-        tankDrive.driverControlArcade(master);
-		//print the x y and theta of the robot
-		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
-		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());
-		pros::lcd::set_text(4, ("Theta: " + std::to_string(robotTheta)).c_str());
+		tankDrive.driverControlArcadeNoET(master);
 		//delay for loop
 		pros::delay(20);
 	}

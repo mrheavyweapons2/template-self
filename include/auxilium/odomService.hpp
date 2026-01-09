@@ -78,6 +78,7 @@ class odomFoundation {
          * @param x Pointer to the robot's X position variable
          * @param y Pointer to the robot's Y position variable
          * @param theta Pointer to the robot's Theta (heading) position variable
+         * @param totalDistance Pointer to the robot's total distance traveled variable
          */
         encoder2imu1ODOM(pros::Motor& leftMotorEnc, pros::Motor& rightMotorEnc, pros::Imu& imu,
                          double* x, double* y, double* theta, double* totalDistance,

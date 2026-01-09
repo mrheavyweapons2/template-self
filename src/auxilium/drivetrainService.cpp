@@ -2,9 +2,13 @@
 #include "pros/misc.h"
 #include "pros/motor_group.hpp"
 #include "math.h"
+#include "pros/motors.h"
 
 //header file
 #include "auxilium/drivetrainService.hpp"
+
+//magic numbers
+#define MOTOR_CUTOFF 1
 
 //implementation of drivetrain methods
 
@@ -16,14 +20,15 @@ driveFrame::driveFrame(double MkP, double MkI, double MkD,
       TkP(TkP), TkI(TkI), TkD(TkD),
 	  x(x), y(y), theta(theta), totalDistance(totalDistance),
       driveCurve(driverCurve), driveOffset(driverOffset),
-      previousError(0), integralSec(0), integralLimit(0)
+      integralLimit(0)
 {
     // Optionally store x, y, theta pointers if you need them as members
     // Otherwise, remove them from the parameter list if not used
 }
 
 // PID function that takes the setpoint and returns a desired value to set the motors to
-double driveFrame::PID(double kP, double kI, double kD, double target, double current) {	
+double driveFrame::PID(double kP, double kI, double kD, double target, double current, 
+					   double previousError, double integralSec) {	
 	double error = target - current;
 
 	// proportional equation
@@ -44,12 +49,6 @@ double driveFrame::PID(double kP, double kI, double kD, double target, double cu
 	double output = proportional + integral + derivative;
 
 	return output;
-}
-
-// Small function for resetting the loop for reusability
-void driveFrame::resetvariables() {
-	previousError = 0;
-	integralSec = 0;
 }
 
 
@@ -89,7 +88,7 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 }
 
 //driver control function that runs an arcade drive scheme
- void tankDrivetrain::driverControlArcade(pros::v5::Controller& controller) {
+void tankDrivetrain::driverControlArcade(pros::v5::Controller& controller) {
 	// arcade drive
 	double forward = pow(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), driveCurve)/driveOffset;
 	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y) < 0 && (forward > 0)) forward = -forward;
@@ -97,55 +96,111 @@ void tankDrivetrain::driverControlTank(pros::v5::Controller& controller) {
 	if (controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X) < 0 && (turn > 0)) turn = -turn;
 	// set the drive velocity
 	setVelocity(forward, turn);
- }
+}
 
- //autonomous function that drives the robot forward a set distance
- void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading) {
+void tankDrivetrain::driverControlArcadeNoET(pros::v5::Controller& controller) {
+	setVelocity(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X)*0.8);
+}
+
+//autonomous function that returns true/false based on if the robot is moving
+bool tankDrivetrain::isStopped() {
+	//check if the motors are moving
+	if (fabs(leftMG.get_actual_velocity()) <= MOTOR_CUTOFF && fabs(rightMG.get_actual_velocity()) <= MOTOR_CUTOFF) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+//autonomous function that stops the robot using brake mode
+void tankDrivetrain::autoStopBrake() {
+	leftMG.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	rightMG.set_brake_mode(pros::E_MOTOR_BRAKE_BRAKE);
+	leftMG.move(0);
+	rightMG.move(0);
+}
+//autonomous function that drives the robot forward a set distance
+void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading) {
 	//get the starting values
 	double distanceOffset = *totalDistance;
 	double headingTarget = *theta;
+	//reset the pid
+	double drivePrevError = 0;
+	double driveIntegralSec = 0;
+	double turnPrevError = 0;
+	double turnIntegralSec = 0;
 	//main loop
 	while (true) {
 		//calculate the forward speed from the PID
-		double forwardSpeed = PID(MkP, MkI, MkD, distance + distanceOffset, *totalDistance);
+		double forwardSpeed = PID(MkP, MkI, MkD, distance + distanceOffset, *totalDistance,
+			 drivePrevError, driveIntegralSec);
+		drivePrevError = distance + distanceOffset - *totalDistance;
+		driveIntegralSec += drivePrevError;
 		//cap the forward speed to the max speed
 		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
 		if (forwardSpeed < -maxSpeed) forwardSpeed = -maxSpeed;
 		//calculate the turn speed from the PID if locking heading
 		double turnSpeed = 0;
 		if (lockHeading) {
-			turnSpeed = PID(TkP, TkI, TkD, headingTarget, *theta);
+			if (fabs(headingTarget - *theta) > 180) {
+				if (headingTarget > *theta) {
+					headingTarget -= 360;
+				} else {
+					headingTarget += 360;
+				}
+			}
+			//get the turn speed from the PID
+			turnSpeed = PID(TkP, TkI, TkD, headingTarget, *theta, 
+				turnPrevError, turnIntegralSec);
+			//update previous error and integral section
+			turnPrevError = headingTarget - *theta;
+			turnIntegralSec += turnPrevError;
 		}
 		//if the distance is within the minimum threshold, break the loop
-		if (fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) break;
+		if ((fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) && isStopped()) break;
 		//set the motor speeds
 		setVelocity(forwardSpeed, turnSpeed);
 		//delay for loop
 		pros::delay(20);
 	}
+	//stop the robot
+	autoStopBrake();
  }
 
- //autonomous function that turns the robot to a set angle
- void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
+//autonomous function that turns the robot to a set angle
+void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
+	//reset the pid
+	double prevError = 0;
+	double integralSec = 0;
 	//main loop
 	while (true) {
+		//see if crossing the 0 degree point is shorter
+		if (fabs(angle - *theta) > 180) {
+			if (angle > *theta) {
+				angle -= 360;
+			} else {
+				angle += 360;
+			}
+		}
 		//calculate the turn speed from the PID
-		double turnSpeed = PID(TkP, TkI, TkD, angle, *theta);
+		double turnSpeed = PID(TkP, TkI, TkD, angle, *theta,
+			 prevError, integralSec);
+		//update previous error and integral section
+		prevError = angle - *theta;
+		integralSec += prevError;
 		//cap the turn speed to the max speed
 		if (turnSpeed > maxSpeed) turnSpeed = maxSpeed;
 		if (turnSpeed < -maxSpeed) turnSpeed = -maxSpeed;
 		//if the turn speed is within the minimum threshold, break the loop
-		//if (fabs(angle - *theta) < autoTurnMin) break;
+		if ((fabs(angle - *theta) < autoTurnMin) && isStopped()) break;
 		//set the motor speeds
 		setVelocity(0, turnSpeed);
 		//delay for loop
 		pros::delay(20);
 	}
- }
-
-//autonomous function that returns true/false based on if the robot is moving
-bool tankDrivetrain::isStopped() {return false;}
-
+	//stop the robot
+	autoStopBrake();
+}
 
 
 

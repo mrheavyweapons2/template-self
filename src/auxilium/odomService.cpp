@@ -36,7 +36,8 @@ encoder2imu1ODOM::encoder2imu1ODOM(pros::Motor& leftMotor, pros::Motor& rightMot
                                     leftEncoder(leftMotor),
                                     rightEncoder(rightMotor),
                                     imuSensor(imu),
-                                    totalDistance(totalDistance) {}
+                                    totalDistance(totalDistance),
+                                    previousLeft(0), previousRight(0) {}
 
 //calculate function for encoder2imu1ODOM class
 void encoder2imu1ODOM::calculate() {

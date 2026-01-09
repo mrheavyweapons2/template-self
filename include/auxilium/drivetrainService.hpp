@@ -29,9 +29,7 @@
 		int driveCurve;
 		int driveOffset;
 
-		//declare PID values
-		double previousError;
-		double integralSec;
+		//pid loop variables
 		double integralLimit;
 
 		//complementary pid function from my code in 2024
@@ -52,7 +50,9 @@
 		double* totalDistance;
 
         //pid function that takes the setpoint and returns a desired value to set the motors to
-        double PID(double kP, double kI, double kD, double target, double current);
+		//returns the value to set the motors to
+        double PID(double kP, double kI, double kD, double target, double current, 
+			double previousError, double integralSec);
 
         //small function for reseting the loop for reusability
 		void resetvariables();
@@ -132,7 +132,25 @@ class tankDrivetrain : public driveFrame {
 		 */
 		void driverControlArcade(pros::v5::Controller& controller);
 
+		/**
+		 * the second control function that takes a controller input and
+		 * sets the motor speeds accordingly (does arcade instead of tank drive).
+		 * @param controller The controller object to read driver input from.
+		 */
+		void driverControlArcadeNoET(pros::v5::Controller& controller);
+
 		//the autonomous functions come after this
+
+		/**
+		 * autonomous function that returns true/false based on if the robot is moving
+		 * @return true if the robot is currently moving, false if it is not
+		 */
+		bool isStopped();
+
+		/**
+		 * autonomous function that stops the robot using brake mode
+		 */
+		void autoStopBrake();
 
 		/**
 		 * autonomous function that drives the robot forward a set distance
@@ -148,12 +166,6 @@ class tankDrivetrain : public driveFrame {
 		 * @param maxSpeed The maximum speed to turn at (0-127)
 		 */
 		void autoTurnToHeading(double angle, double maxSpeed);
-
-		/**
-		 * autonomous function that returns true/false based on if the robot is moving
-		 * @return true if the robot is currently moving, false if it is not
-		 */
-		bool isStopped();
 
 
 };
