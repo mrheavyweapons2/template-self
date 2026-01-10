@@ -76,3 +76,11 @@ void encoder2imu1ODOM::calculate() {
     //add to total distance traveled
     *totalDistance += averageDistance;
 }
+
+//function that offsets the robot's perceived position
+void encoder2imu1ODOM::setPosition(double x, double y, double theta) {
+    //update the imu
+    imuSensor.set_heading(theta);
+    //update the robot's position directly
+    updatePosition(x, y, theta);
+}

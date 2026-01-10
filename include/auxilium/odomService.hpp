@@ -40,7 +40,7 @@ class odomFoundation {
                         double gearRatio, double wheelDiameter);
 
         /**
-         * @brief Virtual function that updates the robot's 
+         * @brief function that updates the robot's 
          * position based on odometry calculations from the
          * odometry system that the base class is used in.
          * @param x The new X position of the robot
@@ -90,6 +90,16 @@ class odomFoundation {
          * update the robot's position and ensure accuracy.
          */
         void calculate();
+
+        /**
+         * @brief function that changes the robots position so that it matches
+         * its actual position on the field, so the robot is on the fields global position
+         * and not just its perceived position from odometry calculations
+         * @param x The X position of the robot
+         * @param y The Y position of the robot
+         * @param theta The Theta (heading) position of the robot
+         */
+        void setPosition(double x, double y, double theta);
 
 };
 
