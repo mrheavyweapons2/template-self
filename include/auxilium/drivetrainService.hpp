@@ -167,6 +167,26 @@ class tankDrivetrain : public driveFrame {
 		 */
 		void autoTurnToHeading(double angle, double maxSpeed);
 
+		/**
+		 * autonomous function that turns the robot to face a point
+		 * @param targetX the x coordinate of the target point
+		 * @param targetY the y coordinate of the target point
+		 * @param maxSpeed the maximum speed to turn at (0-127)
+		 */
+		 void autoTurntoPoint(double targetX, double targetY, double maxSpeed);
+
+		 /**
+		  * autonomous function that drives the robot to a point
+		  * @param targetX the x coordinate of the target point
+		  * @param targetY the y coordinate of the target point
+		  * @param maxSpeed the maximum speed to drive at (0-127)
+		  * @param turnFirst whether to turn or to drive while turning
+		  * (note: setting this to true will significantly increase odom drift if not accounted for)
+		  * @param turnModifier the modifier to apply to turning speed while driving
+		  */
+		  void autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
+								  bool turnFirst= true, double turnModifier = 1.0);
+
 
 };
 

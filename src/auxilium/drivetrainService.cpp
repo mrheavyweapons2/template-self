@@ -202,10 +202,66 @@ void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
 	autoStopBrake();
 }
 
+//autonomous function that turns the robot to face a point
+void tankDrivetrain::autoTurntoPoint(double targetX, double targetY, double maxSpeed) {
+	//calculate the target angle
+	double deltaX = targetX - *x;
+	double deltaY = targetY - *y;
+	double targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
+	//call the turn to heading function
+	autoTurnToHeading(targetAngle, maxSpeed);
+}
 
-
-
-
+//autonomous function that drives the robot to a point
+void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
+									  bool turnFirst, double turnModifier) {
+	//calculate the target angle and distance
+	double deltaX = targetX - *x;
+	double deltaY = targetY - *y;
+	double targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
+	double targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
+	//if turnFirst is true, turn to the target angle first
+	if (turnFirst) {
+		autoTurnToHeading(targetAngle, maxSpeed);
+	}
+	//reset the pid
+	double drivePrevError = 0;
+	double driveIntegralSec = 0;
+	double turnPrevError = 0;
+	double turnIntegralSec = 0;
+	//main loop
+	while (true) {
+		//calculate the forward speed from the PID
+		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance + *totalDistance, *totalDistance,
+			 drivePrevError, driveIntegralSec);
+		drivePrevError = (targetDistance + *totalDistance) - *totalDistance;
+		driveIntegralSec += drivePrevError;
+		//cap the forward speed to the max speed
+		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
+		if (forwardSpeed < -maxSpeed) forwardSpeed = -maxSpeed;
+		//calculate the turn speed from the PID
+		if (fabs(targetAngle - *theta) > 180) {
+			if (targetAngle > *theta) {
+				targetAngle -= 360;
+			} else {
+				targetAngle += 360;
+			}
+		}
+		double turnSpeed = PID(TkP, TkI, TkD, targetAngle, *theta, 
+			turnPrevError, turnIntegralSec) * turnModifier;
+		//update previous error and integral section
+		turnPrevError = targetAngle - *theta;
+		turnIntegralSec += turnPrevError;
+		//if the distance is within the minimum threshold, break the loop
+		if ((fabs((targetDistance + *totalDistance) - *totalDistance) < autoDriveMin) && isStopped()) break;
+		//set the motor speeds
+		setVelocity(forwardSpeed, turnSpeed);
+		//delay for loop
+		pros::delay(20);
+	}
+	//stop the robot
+	autoStopBrake();
+}
 //constructor for xDrivetrain here
 omniDrivetrain::omniDrivetrain(pros::MotorGroup& frontLeftMotorgroup, pros::MotorGroup& frontRightMotorgroup, //front motor groups
                          pros::MotorGroup& backLeftMotorgroup, pros::MotorGroup& backRightMotorgroup, //rear motor groups
