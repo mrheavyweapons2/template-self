@@ -28,7 +28,7 @@
 #define drivetrainTKI 0.001 //integral for turning
 #define drivetrainTKD 14 //derivative for turning
 
-#define drivetrainAutoDriveMin 10 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
+#define drivetrainAutoDriveMin 20 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
 #define drivetrainAutoTurnMin 1.9 //minimum angle (in degrees) for the auto turn function to consider itself at the target
 
 //driver control curve settings
@@ -114,7 +114,12 @@ void competition_initialize() {}
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
 void autonomous() {
 	//test turn here
-	tankDrive.autoDriveDistance(-1800, 75,true);
+	tankDrive.autoDriveToPoint(300,-600, 75);
+	tankDrive.autoDriveToPoint(1500, -600, 75);
+	tankDrive.autoDriveToPoint(1500, 600, 75);
+	tankDrive.autoDriveToPoint(300, 600, 75);
+	tankDrive.autoDriveToPoint(0, 0 ,75);
+	tankDrive.autoTurntoPoint(0,-600,75);
 }
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
