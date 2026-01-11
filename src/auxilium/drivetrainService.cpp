@@ -9,10 +9,9 @@
 
 //magic numbers
 #define MOTOR_CUTOFF 1
-#define IMPRECISE_MULTIPLIER 3
+#define IMPRECISE_MULTIPLIER 2
 
 //implementation of drivetrain methods
-
 driveFrame::driveFrame(double MkP, double MkI, double MkD,
                        double TkP, double TkI, double TkD,
                        int driverCurve, int driverOffset,
@@ -58,12 +57,28 @@ double driveFrame::PID(double kP, double kI, double kD, double target, double cu
 tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup, //declare the motorgroups
                                double MkP, double MkI, double MkD, //movement PID values
                                double TkP, double TkI, double TkD, //turning PID values
+							   double forwardDeadzone, double turnDeadzone, //deadzone values
 							   double autoTurnMin, double autoDriveMin, //minimum distance needed for function cutoffs
                                int driverCurve, int driverOffset, //driver exponential curve values
                                double* x, double* y, double* theta, double* totalDistance) //pointers that relay the robots position
     : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta, totalDistance),
       leftMG(leftMotorgroup), rightMG(rightMotorgroup), //initialize the motor groups
-	  autoTurnMin(autoTurnMin), autoDriveMin(autoDriveMin) {} //initialize the minimum auto cutoffs
+	  autoTurnMin(autoTurnMin), autoDriveMin(autoDriveMin),
+	  forwardDeadzone(forwardDeadzone), turnDeadzone(turnDeadzone) {} //initialize the minimum auto cutoffs
+
+//helper function for deadzone mapping
+static int linearDeadzoneMap(int u, int deadzone) {
+    if (u == 0) return 0;
+
+    int sign = (u > 0) ? 1 : -1;
+    int absU = abs(u);
+
+    //linear remap: [1..127] → [deadzone..127]
+    float slope = (127.0f - deadzone) / 126.0f;
+    float output = deadzone + (absU - 1) * slope;
+
+    return sign * static_cast<int>(output + 0.5f);
+}
 
 // Function that takes the turn and forward values and sets the motor speeds accordingly
 void tankDrivetrain::setVelocity(int forward, int turn) {
@@ -72,7 +87,10 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 	if (forward < -127) forward = -127;
 	if (turn > 127) turn = 127;
 	if (turn < -127) turn = -127;
-	// set the motor values
+	//use a linear remapping function to have the deadzone value act as a 0
+	if (forward != 0) forward = linearDeadzoneMap(forward, forwardDeadzone);
+	if (turn != 0) turn = linearDeadzoneMap(turn, turnDeadzone);
+	//set the motor values
 	leftMG.move(forward + turn);
 	rightMG.move(forward - turn);
 }
@@ -230,7 +248,6 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 	double deltaX = targetX - *x;
 	double deltaY = targetY - *y;
 	double targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
-	double distanceOffset = *totalDistance;
 	double targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
 	//if turnFirst is true, turn to the target angle first
 	if (turnFirst) {
@@ -243,10 +260,24 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 	double turnIntegralSec = 0;
 	//main loop
 	while (true) {
+		//update the delta X an Y and target distance
+		deltaX = targetX - *x;
+		deltaY = targetY - *y; 
+		targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
+		//check if the robot has to go backwards instead of forwards
+		targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
+		if (fabs(targetAngle - *theta) > 90 && fabs(targetAngle - *theta) < 270) {
+			targetDistance = -targetDistance;
+			if (targetAngle > 180) {
+				targetAngle -= 180;
+			} else {
+				targetAngle += 180;
+			}
+		}
 		//calculate the forward speed from the PID
-		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance + distanceOffset, *totalDistance,
+		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance, 0,
 			 drivePrevError, driveIntegralSec);
-		drivePrevError = (targetDistance + distanceOffset) - *totalDistance;
+		drivePrevError = targetDistance - 0;
 		driveIntegralSec += drivePrevError;
 		//cap the forward speed to the max speed
 		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
@@ -264,9 +295,6 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		//update previous error and integral section
 		turnPrevError = targetAngle - *theta;
 		turnIntegralSec += turnPrevError;
-		//update the delta X an Y
-		deltaX = targetX - *x;
-		deltaY = targetY - *y; 
 		//check if precise stopping is enabled
 		if (precise) {
 			//if the distance is within the minimum threshold, break the loop

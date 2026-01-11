@@ -106,6 +106,11 @@ class tankDrivetrain : public driveFrame {
 		double autoTurnMin;
 		double autoDriveMin;
 
+		//drivetrain deadzone variables 
+		//(motor voltage below this value is unable to move the robot)
+		double forwardDeadzone;
+		double turnDeadzone;
+
         //function that takes the turn and forward values and sets the motor speeds accordingly
 		void setVelocity(int forward, int turn);
 
@@ -114,6 +119,7 @@ class tankDrivetrain : public driveFrame {
 		tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGroup& rightMotorgroup,
                        double MkP, double MkI, double MkD,
                        double TkP, double TkI, double TkD,
+					   double forwardDeadzone, double turnDeadzone,
                        double autoTurnMin, double autoDriveMin, 
 					   int driverCurve, int driverOffset,
                        double* x, double* y, double* theta, double* totalDistance); 

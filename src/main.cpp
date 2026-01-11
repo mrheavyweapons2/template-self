@@ -22,14 +22,17 @@
 //defining PID values for movement, as well as turning
 #define drivetrainMKP 0.75 //proportional for movement
 #define drivetrainMKI 0.001 //integral for movement
-#define drivetrainMKD 3 //derivative for movement
+#define drivetrainMKD 4 //derivative for movement
 
-#define drivetrainTKP 4 //proportional for turning
+#define drivetrainTKP 3.2 //proportional for turning
 #define drivetrainTKI 0.001 //integral for turning
-#define drivetrainTKD 14 //derivative for turning
+#define drivetrainTKD 11.5 //derivative for turning
+
+#define drivetrainForwardDeadzone 6 //deadzone for forward movement
+#define drivetrainTurnDeadzone 7 //deadzone for turning
 
 #define drivetrainAutoDriveMin 20 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
-#define drivetrainAutoTurnMin 1.9 //minimum angle (in degrees) for the auto turn function to consider itself at the target
+#define drivetrainAutoTurnMin 2 //minimum angle (in degrees) for the auto turn function to consider itself at the target
 
 //driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
@@ -52,6 +55,7 @@ pros::MotorGroup rightMG({-4, 5,6},GEARSET);
 tankDrivetrain tankDrive(leftMG, rightMG, //motor groups
 						   drivetrainMKP, drivetrainMKI, drivetrainMKD, //forward pid values
 						   drivetrainTKP, drivetrainTKI, drivetrainTKD, //turning pid values
+						   drivetrainForwardDeadzone, drivetrainTurnDeadzone, //deadzone values
 						   drivetrainAutoTurnMin, drivetrainAutoDriveMin, //minimum distance values for autonomous functions
 						   DRIVECURVE, CURVEOFFSET, //driver control curve values
 						   &robotX, &robotY, &robotTheta, &totalDistance); //pointers for robot position
@@ -82,11 +86,11 @@ void odomLoop(void* param) {
 //helper function to run a print to lcd loop
 void lcdLoop(void* param) {
 	while (true) {
+		pros::v5::Controller master(pros::E_CONTROLLER_MASTER);
 		//print the x y and theta of the robot
 		pros::lcd::set_text(2, ("X: " + std::to_string(robotX)).c_str());
 		pros::lcd::set_text(3, ("Y: " + std::to_string(robotY)).c_str());
 		pros::lcd::set_text(4, ("Theta: " + std::to_string(robotTheta)).c_str());
-		pros::lcd::set_text(5, ("Test Value: " + std::to_string(leftMG.get_actual_velocity())).c_str());
 		//delay for loop
 		pros::delay(20);
 	}
@@ -114,12 +118,12 @@ void competition_initialize() {}
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
 void autonomous() {
 	//test turn here
-	tankDrive.autoDriveToPoint(300,-600, 75);
-	tankDrive.autoDriveToPoint(1500, -600, 75);
-	tankDrive.autoDriveToPoint(1500, 600, 75);
-	tankDrive.autoDriveToPoint(300, 600, 75);
-	tankDrive.autoDriveToPoint(0, 0 ,75);
-	tankDrive.autoTurntoPoint(0,-600,75);
+	tankDrive.autoDriveToPoint(300,-600, 75, true, 1, false);
+	tankDrive.autoDriveToPoint(1500, -600, 75,true, 1, false);
+	tankDrive.autoDriveToPoint(1500, 600, 75,true, 1, false);
+	tankDrive.autoDriveToPoint(300, 600, 75,true, 1, false);
+	tankDrive.autoDriveToPoint(0, 0, 75);
+	tankDrive.autoTurntoPoint(-300,0,75);
 }
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode
