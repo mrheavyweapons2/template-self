@@ -267,8 +267,13 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		//update the delta X an Y
 		deltaX = targetX - *x;
 		deltaY = targetY - *y; 
-		//if the distance is within the minimum threshold, break the loop
-		if ((fabs(deltaX ) <= autoDriveMin) && (fabs(deltaY) <= autoDriveMin) && isStopped()) break;
+		//check if precise stopping is enabled
+		if (precise) {
+			//if the distance is within the minimum threshold, break the loop
+			if ((fabs(deltaX) <= autoDriveMin) && (fabs(deltaY) <= autoDriveMin) && isStopped()) break;
+		} else {
+			if ((fabs(deltaX) <= autoDriveMin * IMPRECISE_MULTIPLIER) && (fabs(deltaY) <= autoDriveMin * IMPRECISE_MULTIPLIER)) break;
+		}
 		//set the motor speeds
 		setVelocity(forwardSpeed, turnSpeed);
 		//delay for loop
