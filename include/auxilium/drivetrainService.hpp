@@ -157,23 +157,26 @@ class tankDrivetrain : public driveFrame {
 		 * @param distance The distance to drive forward in inches
 		 * @param maxSpeed The maximum speed to drive at (0-127),
 		 * @param lockHeading optional parameter that locks the robots heading during the drive
+		 * @param precise optional parameter that enables a more precise stopping method
 		 */
-		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false);
+		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false, bool precise = true);
 
 		/**
 		 * autonomous function that turns the robot to a set angle
 		 * @param angle The angle to turn to in degrees (0-360)
 		 * @param maxSpeed The maximum speed to turn at (0-127)
+		 * @param precise optional parameter that enables a more precise stopping method
 		 */
-		void autoTurnToHeading(double angle, double maxSpeed);
+		void autoTurnToHeading(double angle, double maxSpeed, bool precise = true);
 
 		/**
 		 * autonomous function that turns the robot to face a point
 		 * @param targetX the x coordinate of the target point
 		 * @param targetY the y coordinate of the target point
 		 * @param maxSpeed the maximum speed to turn at (0-127)
+		 * @param precise optional parameter that enables a more precise stopping method
 		 */
-		 void autoTurntoPoint(double targetX, double targetY, double maxSpeed);
+		 void autoTurntoPoint(double targetX, double targetY, double maxSpeed, bool precise = true);
 
 		 /**
 		  * autonomous function that drives the robot to a point
@@ -183,9 +186,10 @@ class tankDrivetrain : public driveFrame {
 		  * @param turnFirst whether to turn or to drive while turning
 		  * (note: setting this to true will significantly increase odom drift if not accounted for)
 		  * @param turnModifier the modifier to apply to turning speed while driving
+		  * @param precise optional parameter that enables a more precise stopping method
 		  */
 		  void autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
-								  bool turnFirst= true, double turnModifier = 1.0);
+								  bool turnFirst= true, double turnModifier = 1.0, bool precise = true);
 
 
 };

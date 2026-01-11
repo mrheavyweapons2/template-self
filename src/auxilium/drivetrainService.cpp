@@ -9,6 +9,7 @@
 
 //magic numbers
 #define MOTOR_CUTOFF 1
+#define IMPRECISE_MULTIPLIER 3
 
 //implementation of drivetrain methods
 
@@ -120,7 +121,7 @@ void tankDrivetrain::autoStopBrake() {
 	rightMG.move(0);
 }
 //autonomous function that drives the robot forward a set distance
-void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading) {
+void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading, bool precise) {
 	//get the starting values
 	double distanceOffset = *totalDistance;
 	double headingTarget = *theta;
@@ -156,8 +157,13 @@ void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lo
 			turnPrevError = headingTarget - *theta;
 			turnIntegralSec += turnPrevError;
 		}
-		//if the distance is within the minimum threshold, break the loop
-		if ((fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) && isStopped()) break;
+		//check if precise stopping is enabled
+		if (precise) {
+			//if the turn speed is within the minimum threshold, break the loop
+			if ((fabs((distance + distanceOffset) - *totalDistance) < autoDriveMin) && isStopped()) break;
+		} else {
+			if (fabs((distance + distanceOffset) - *totalDistance) < (autoDriveMin * IMPRECISE_MULTIPLIER)) break;
+		}
 		//set the motor speeds
 		setVelocity(forwardSpeed, turnSpeed);
 		//delay for loop
@@ -168,7 +174,7 @@ void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lo
  }
 
 //autonomous function that turns the robot to a set angle
-void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
+void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed, bool precise) {
 	//reset the pid
 	double prevError = 0;
 	double integralSec = 0;
@@ -191,8 +197,13 @@ void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
 		//cap the turn speed to the max speed
 		if (turnSpeed > maxSpeed) turnSpeed = maxSpeed;
 		if (turnSpeed < -maxSpeed) turnSpeed = -maxSpeed;
-		//if the turn speed is within the minimum threshold, break the loop
-		if ((fabs(angle - *theta) < autoTurnMin) && isStopped()) break;
+		//check if precise stopping is enabled
+		if (precise) {
+			//if the turn speed is within the minimum threshold, break the loop
+			if ((fabs(angle - *theta) < autoTurnMin) && isStopped()) break;
+		} else {
+			if (fabs(angle - *theta) < (autoTurnMin * IMPRECISE_MULTIPLIER)) break;
+		}
 		//set the motor speeds
 		setVelocity(0, turnSpeed);
 		//delay for loop
@@ -203,7 +214,7 @@ void tankDrivetrain::autoTurnToHeading(double angle, double maxSpeed) {
 }
 
 //autonomous function that turns the robot to face a point
-void tankDrivetrain::autoTurntoPoint(double targetX, double targetY, double maxSpeed) {
+void tankDrivetrain::autoTurntoPoint(double targetX, double targetY, double maxSpeed, bool precise) {
 	//calculate the target angle
 	double deltaX = targetX - *x;
 	double deltaY = targetY - *y;
@@ -214,7 +225,7 @@ void tankDrivetrain::autoTurntoPoint(double targetX, double targetY, double maxS
 
 //autonomous function that drives the robot to a point
 void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
-									  bool turnFirst, double turnModifier) {
+									  bool turnFirst, double turnModifier, bool precise) {
 	//calculate the target angle and distance
 	double deltaX = targetX - *x;
 	double deltaY = targetY - *y;
