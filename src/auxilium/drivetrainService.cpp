@@ -230,6 +230,7 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 	double deltaX = targetX - *x;
 	double deltaY = targetY - *y;
 	double targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
+	double distanceOffset = *totalDistance;
 	double targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
 	//if turnFirst is true, turn to the target angle first
 	if (turnFirst) {
@@ -243,9 +244,9 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 	//main loop
 	while (true) {
 		//calculate the forward speed from the PID
-		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance + *totalDistance, *totalDistance,
+		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance + distanceOffset, *totalDistance,
 			 drivePrevError, driveIntegralSec);
-		drivePrevError = (targetDistance + *totalDistance) - *totalDistance;
+		drivePrevError = (targetDistance + distanceOffset) - *totalDistance;
 		driveIntegralSec += drivePrevError;
 		//cap the forward speed to the max speed
 		if (forwardSpeed > maxSpeed) forwardSpeed = maxSpeed;
@@ -263,8 +264,11 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		//update previous error and integral section
 		turnPrevError = targetAngle - *theta;
 		turnIntegralSec += turnPrevError;
+		//update the delta X an Y
+		deltaX = targetX - *x;
+		deltaY = targetY - *y; 
 		//if the distance is within the minimum threshold, break the loop
-		if ((fabs((targetDistance + *totalDistance) - *totalDistance) < autoDriveMin) && isStopped()) break;
+		if ((fabs(deltaX ) <= autoDriveMin) && (fabs(deltaY) <= autoDriveMin) && isStopped()) break;
 		//set the motor speeds
 		setVelocity(forwardSpeed, turnSpeed);
 		//delay for loop
