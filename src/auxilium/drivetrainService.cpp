@@ -7,7 +7,8 @@
 //header file
 #include "auxilium/drivetrainService.hpp"
 
-//magic numbers
+//constant numbers that should not often be adjusted, but can be changed if needed
+#define STICK_DRIFT 5
 #define MOTOR_CUTOFF 1
 #define IMPRECISE_MULTIPLIER 2
 
@@ -89,11 +90,14 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 	if (turn > 127) turn = 127;
 	if (turn < -127) turn = -127;
 	//use a linear remapping function to have the deadzone value act as a 0
-	if (forward >= 1) forward = linearDeadzoneMap(forward, forwardDeadzone);
-	if (turn >= 1) turn = linearDeadzoneMap(turn, turnDeadzone);
+	if (forward > 0) forward = linearDeadzoneMap(forward, forwardDeadzone);
+	if (turn > 0) turn = linearDeadzoneMap(turn, turnDeadzone);
 	//set the motor values
 	leftMG.move(forward + turn);
 	rightMG.move(forward - turn);
+	//set the previous forward and turn values for use in the next PID loop
+	prevForward = forward;
+	prevTurn = turn;
 }
 
 //driver control function that runs a tank drive scheme
@@ -119,7 +123,14 @@ void tankDrivetrain::driverControlArcade(pros::v5::Controller& controller) {
 }
 
 void tankDrivetrain::driverControlArcadeNoET(pros::v5::Controller& controller) {
-	setVelocity(controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y), controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X)*0.8);
+	//get the joystick values
+	double forward = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
+	double turn = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
+	//account for stick drift
+	if (fabs(forward) < STICK_DRIFT) forward = 0;
+	if (fabs(turn) < STICK_DRIFT) turn = 0;
+	//set the drive velocity
+	setVelocity(forward, turn);
 }
 
 //autonomous function that returns true/false based on if the robot is moving
