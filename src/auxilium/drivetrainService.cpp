@@ -89,8 +89,8 @@ void tankDrivetrain::setVelocity(int forward, int turn) {
 	if (turn > 127) turn = 127;
 	if (turn < -127) turn = -127;
 	//use a linear remapping function to have the deadzone value act as a 0
-	if (forward != 0) forward = linearDeadzoneMap(forward, forwardDeadzone);
-	if (turn != 0) turn = linearDeadzoneMap(turn, turnDeadzone);
+	if (forward >= 1) forward = linearDeadzoneMap(forward, forwardDeadzone);
+	if (turn >= 1) turn = linearDeadzoneMap(turn, turnDeadzone);
 	//set the motor values
 	leftMG.move(forward + turn);
 	rightMG.move(forward - turn);
