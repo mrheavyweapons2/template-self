@@ -117,13 +117,10 @@ void competition_initialize() {}
 
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
 void autonomous() {
+	//test set to position
+	odomSystem.setPosition(600, 0, 90);
 	//test turn here
-	tankDrive.autoDriveToPoint(300,-600, 75, true, 1, false);
-	tankDrive.autoDriveToPoint(1500, -600, 75,true, 1, false);
-	tankDrive.autoDriveToPoint(1500, 600, 75,true, 1, false);
-	tankDrive.autoDriveToPoint(300, 600, 75,true, 1, false);
-	tankDrive.autoDriveToPoint(0, 0, 75);
-	tankDrive.autoTurntoPoint(-300,0,75);
+	tankDrive.autoDriveToPoint(0,0, 75, true, 1, false);
 }
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode

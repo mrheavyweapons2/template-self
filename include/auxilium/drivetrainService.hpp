@@ -111,6 +111,10 @@ class tankDrivetrain : public driveFrame {
 		double forwardDeadzone;
 		double turnDeadzone;
 
+		//values to measure the previous forward and turn velos
+		double prevForward;
+		double prevTurn;
+
         //function that takes the turn and forward values and sets the motor speeds accordingly
 		void setVelocity(int forward, int turn);
 

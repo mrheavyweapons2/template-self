@@ -64,7 +64,8 @@ tankDrivetrain::tankDrivetrain(pros::MotorGroup& leftMotorgroup, pros::MotorGrou
     : driveFrame(MkP, MkI, MkD, TkP, TkI, TkD, driverCurve, driverOffset, x, y, theta, totalDistance),
       leftMG(leftMotorgroup), rightMG(rightMotorgroup), //initialize the motor groups
 	  autoTurnMin(autoTurnMin), autoDriveMin(autoDriveMin),
-	  forwardDeadzone(forwardDeadzone), turnDeadzone(turnDeadzone) {} //initialize the minimum auto cutoffs
+	  forwardDeadzone(forwardDeadzone), turnDeadzone(turnDeadzone),
+	  prevForward(0), prevTurn(0) {} //initialize the minimum auto cutoffs
 
 //helper function for deadzone mapping
 static int linearDeadzoneMap(int u, int deadzone) {
