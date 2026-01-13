@@ -151,10 +151,11 @@ void tankDrivetrain::autoStopBrake() {
 	rightMG.move(0);
 }
 //autonomous function that drives the robot forward a set distance
-void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading, bool precise) {
+void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lockHeading, double heading, bool precise) {
 	//get the starting values
 	double distanceOffset = *totalDistance;
 	double headingTarget = *theta;
+	if (lockHeading) headingTarget = heading;
 	//reset the pid
 	double drivePrevError = 0;
 	double driveIntegralSec = 0;
@@ -254,7 +255,7 @@ void tankDrivetrain::autoTurntoPoint(double targetX, double targetY, double maxS
 }
 
 //autonomous function that drives the robot to a point
-void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
+void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double maxSpeed, bool reverse, 
 									  bool turnFirst, double turnModifier, bool precise) {
 	//calculate the target angle and distance
 	double deltaX = targetX - *x;
@@ -263,6 +264,9 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 	double targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
 	//if turnFirst is true, turn to the target angle first
 	if (turnFirst) {
+		if (reverse) {
+			if (targetAngle > 180) targetAngle -= 180; else targetAngle += 180;
+		}
 		autoTurnToHeading(targetAngle, maxSpeed);
 	}
 	//reset the pid
@@ -278,6 +282,10 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		targetDistance = sqrt((deltaX * deltaX) + (deltaY * deltaY));
 		//check if the robot has to go backwards instead of forwards
 		targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
+		//reverse check for the angle if needed
+		if (reverse) {
+			if (targetAngle > 180) targetAngle -= 180; else targetAngle += 180;
+		}
 		if (fabs(targetAngle - *theta) > 90 && fabs(targetAngle - *theta) < 270) {
 			targetDistance = -targetDistance;
 			if (targetAngle > 180) {

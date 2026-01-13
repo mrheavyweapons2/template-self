@@ -167,9 +167,10 @@ class tankDrivetrain : public driveFrame {
 		 * @param distance The distance to drive forward in inches
 		 * @param maxSpeed The maximum speed to drive at (0-127),
 		 * @param lockHeading optional parameter that locks the robots heading during the drive
+		 * @param heading optional parameter that sets the heading to lock to if lockHeading is true
 		 * @param precise optional parameter that enables a more precise stopping method
 		 */
-		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false, bool precise = true);
+		void autoDriveDistance(double distance, double maxSpeed, bool lockHeading = false, double heading = 0, bool precise = true);
 
 		/**
 		 * autonomous function that turns the robot to a set angle
@@ -193,12 +194,13 @@ class tankDrivetrain : public driveFrame {
 		  * @param targetX the x coordinate of the target point
 		  * @param targetY the y coordinate of the target point
 		  * @param maxSpeed the maximum speed to drive at (0-127)
+		  * @param reverse whether to drive in reverse to the point
 		  * @param turnFirst whether to turn or to drive while turning
 		  * (note: setting this to true will significantly increase odom drift if not accounted for)
 		  * @param turnModifier the modifier to apply to turning speed while driving
 		  * @param precise optional parameter that enables a more precise stopping method
 		  */
-		  void autoDriveToPoint(double targetX, double targetY, double maxSpeed, 
+		  void autoDriveToPoint(double targetX, double targetY, double maxSpeed, bool reverse = false,
 								  bool turnFirst= true, double turnModifier = 1.0, bool precise = true);
 
 
