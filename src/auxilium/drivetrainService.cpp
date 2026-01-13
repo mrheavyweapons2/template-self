@@ -284,7 +284,10 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		targetAngle = atan2(deltaY, deltaX) * (180.0 / M_PI);
 		//reverse check for the angle if needed
 		if (reverse) {
+			//reverse the target distance and angle
+			targetDistance = -targetDistance;
 			if (targetAngle > 180) targetAngle -= 180; else targetAngle += 180;
+			
 		}
 		if (fabs(targetAngle - *theta) > 90 && fabs(targetAngle - *theta) < 270) {
 			targetDistance = -targetDistance;
