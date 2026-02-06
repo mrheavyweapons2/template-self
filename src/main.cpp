@@ -20,19 +20,19 @@
 #define GEARSET pros::v5::MotorGears::blue //motor gearset
 
 //defining PID values for movement, as well as turning
-#define drivetrainMKP 0.75 //proportional for movement
-#define drivetrainMKI 0.001 //integral for movement
+#define drivetrainMKP 0.8 //proportional for movement
+#define drivetrainMKI 0.04 //integral for movement
 #define drivetrainMKD 4 //derivative for movement
 
-#define drivetrainTKP 3.2 //proportional for turning
-#define drivetrainTKI 0.001 //integral for turning
-#define drivetrainTKD 11.5 //derivative for turning
+#define drivetrainTKP 3 //proportional for turning
+#define drivetrainTKI 0.1 //integral for turning
+#define drivetrainTKD 13 //derivative for turning
 
-#define drivetrainForwardDeadzone 6 //deadzone for forward movement
+#define drivetrainForwardDeadzone 7 //deadzone for forward movement
 #define drivetrainTurnDeadzone 7 //deadzone for turning
 
 #define drivetrainAutoDriveMin 20 //minimum distance (in millimeters) for the auto drive function to consider itself at the target
-#define drivetrainAutoTurnMin 2 //minimum angle (in degrees) for the auto turn function to consider itself at the target
+#define drivetrainAutoTurnMin 3 //minimum angle (in degrees) for the auto turn function to consider itself at the target
 
 //driver control curve settings
 #define DRIVECURVE 2 //exponential curve for driver control
@@ -118,9 +118,9 @@ void competition_initialize() {}
 //prebuilt that runs the autonomous code when either the field management system sets it as so or the robot is on autonomous skills mode
 void autonomous() {
 	//test set to position
-	odomSystem.setPosition(600, 0, 90);
-	//test turn here
-	tankDrive.autoDriveToPoint(0,0, 75, true, 1, false);
+	tankDrive.autoDriveToPoint(600,0, 75, true);
+	tankDrive.autoDriveToPoint(-300, 0, 75, true);
+	tankDrive.autoDriveToPoint(-300, 600, 75,true);
 }
 
 //prebuilt function that runs by default when the robot is disconnected from the field controller or is set to driver control mode

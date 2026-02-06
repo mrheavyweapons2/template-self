@@ -29,9 +29,6 @@
 		int driveCurve;
 		int driveOffset;
 
-		//pid loop variables
-		double integralLimit;
-
 		//complementary pid function from my code in 2024
 		//PID values for distance (modified to be constructor based)
 		//movement

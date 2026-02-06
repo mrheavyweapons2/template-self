@@ -8,9 +8,15 @@
 #include "auxilium/drivetrainService.hpp"
 
 //constant numbers that should not often be adjusted, but can be changed if needed
-#define STICK_DRIFT 5
-#define MOTOR_CUTOFF 1
-#define IMPRECISE_MULTIPLIER 2
+#define TURN_STICK_DRIFT 5
+#define FORWARD_STICK_DRIFT 4
+
+#define MOTOR_CUTOFF 4
+#define DRIVE_TURNING_CUTOFF 100 //in millimeters to the target
+#define DRIVE_FOWARD_CUTOFF 5 //in millimeters to the target
+#define IMPRECISE_MULTIPLIER 1.2
+
+#define INTEGRAL_LIMIT 25
 
 //implementation of drivetrain methods
 driveFrame::driveFrame(double MkP, double MkI, double MkD,
@@ -20,8 +26,7 @@ driveFrame::driveFrame(double MkP, double MkI, double MkD,
     : MkP(MkP), MkI(MkI), MkD(MkD),
       TkP(TkP), TkI(TkI), TkD(TkD),
 	  x(x), y(y), theta(theta), totalDistance(totalDistance),
-      driveCurve(driverCurve), driveOffset(driverOffset),
-      integralLimit(0)
+      driveCurve(driverCurve), driveOffset(driverOffset)
 {
     // Optionally store x, y, theta pointers if you need them as members
     // Otherwise, remove them from the parameter list if not used
@@ -38,8 +43,8 @@ double driveFrame::PID(double kP, double kI, double kD, double target, double cu
 	// integral equation
 	integralSec += error;
 	// if integral error gets too large, change it to the max (prevents windup)
-	if (integralSec > integralLimit) integralSec = integralLimit;
-	if (integralSec < -integralLimit) integralSec = -integralLimit;
+	if (integralSec > INTEGRAL_LIMIT) integralSec = INTEGRAL_LIMIT;
+	if (integralSec < -INTEGRAL_LIMIT) integralSec = -INTEGRAL_LIMIT;
 	double integral = integralSec * kI;
 
 	// derivative equation
@@ -127,8 +132,8 @@ void tankDrivetrain::driverControlArcadeNoET(pros::v5::Controller& controller) {
 	double forward = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_Y);
 	double turn = controller.get_analog(pros::E_CONTROLLER_ANALOG_LEFT_X);
 	//account for stick drift
-	if (fabs(forward) < STICK_DRIFT) forward = 0;
-	if (fabs(turn) < STICK_DRIFT) turn = 0;
+	if (fabs(forward) < FORWARD_STICK_DRIFT) forward = 0;
+	if (fabs(turn) < TURN_STICK_DRIFT) turn = 0;
 	//set the drive velocity
 	setVelocity(forward, turn);
 }
@@ -165,6 +170,10 @@ void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lo
 		//calculate the forward speed from the PID
 		double forwardSpeed = PID(MkP, MkI, MkD, distance + distanceOffset, *totalDistance,
 			 drivePrevError, driveIntegralSec);
+		//cutoff the forward speed if within the cutoff to prevent excessive oscillation
+		if (fabs(distance + distanceOffset - *totalDistance) < DRIVE_FOWARD_CUTOFF) {
+			forwardSpeed = 0;
+		}
 		drivePrevError = distance + distanceOffset - *totalDistance;
 		driveIntegralSec += drivePrevError;
 		//cap the forward speed to the max speed
@@ -183,6 +192,10 @@ void tankDrivetrain::autoDriveDistance(double distance, double maxSpeed, bool lo
 			//get the turn speed from the PID
 			turnSpeed = PID(TkP, TkI, TkD, headingTarget, *theta, 
 				turnPrevError, turnIntegralSec);
+			//set turnspeed to 0 if within the cutoff distance to prevent excessive turning and oscillation
+			if (fabs((distance + distanceOffset) - *totalDistance) < DRIVE_TURNING_CUTOFF) {
+				turnSpeed = 0;
+			}
 			//update previous error and integral section
 			turnPrevError = headingTarget - *theta;
 			turnIntegralSec += turnPrevError;
@@ -289,6 +302,10 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		//calculate the forward speed from the PID
 		double forwardSpeed = PID(MkP, MkI, MkD, targetDistance, 0,
 			 drivePrevError, driveIntegralSec);
+		//cutoff the forward speed if within the cutoff to prevent excessive oscillation
+		if (fabs(targetDistance) < DRIVE_FOWARD_CUTOFF) {
+			forwardSpeed = 0;
+		}
 		drivePrevError = targetDistance - 0;
 		driveIntegralSec += drivePrevError;
 		//cap the forward speed to the max speed
@@ -304,6 +321,10 @@ void tankDrivetrain::autoDriveToPoint(double targetX, double targetY, double max
 		}
 		double turnSpeed = PID(TkP, TkI, TkD, targetAngle, *theta, 
 			turnPrevError, turnIntegralSec) * turnModifier;
+		//set turnspeed to 0 if within the cutoff distance to prevent excessive turning and oscillation
+		if (fabs(targetDistance) < DRIVE_TURNING_CUTOFF) {
+			turnSpeed = 0;
+		}
 		//update previous error and integral section
 		turnPrevError = targetAngle - *theta;
 		turnIntegralSec += turnPrevError;
